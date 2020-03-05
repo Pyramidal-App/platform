@@ -1,0 +1,24 @@
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  avatarUrl: String
+}
+
+type UserAndToken {
+  token: String!
+  user: User!
+}
+
+input LogInWithGoogleInput {
+  accessToken: String!
+  idToken: String!
+}
+
+type Mutation {
+  logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
+}
+
+type Query {
+  listUsers: [User]
+}
