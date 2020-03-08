@@ -1,3 +1,7 @@
 import User from './User'
-// I'll add associations here later
-export { User }
+import TelemarketingSheet from './TelemarketingSheet'
+
+User.hasMany(TelemarketingSheet)
+TelemarketingSheet.belongsTo(User)
+
+export { User, TelemarketingSheet }

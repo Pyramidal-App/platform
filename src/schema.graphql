@@ -5,9 +5,20 @@ type User {
   avatarUrl: String
 }
 
+type TelemarketingSheet {
+  id: ID!
+  countryCode: Int!
+  areaCode: Int!
+  firstNumbers: Int!
+}
+
 type UserAndToken {
   token: String!
   user: User!
+}
+
+type GenericActionResponse {
+  success: Boolean!
 }
 
 input LogInWithGoogleInput {
@@ -15,10 +26,18 @@ input LogInWithGoogleInput {
   idToken: String!
 }
 
+input CreateTelemarketingSheetInput {
+  countryCode: String!
+  areaCode: String!
+  firstNumbers: String!
+}
+
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
+  createTelemarketingSheet(input: CreateTelemarketingSheetInput!): TelemarketingSheet
 }
 
 type Query {
   listUsers: [User]
+  telemarketingSheet(firstNumbers: String!): TelemarketingSheet
 }

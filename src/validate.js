@@ -10,18 +10,22 @@ validate.validators.aryLength = (value, options) => {
   }
 }
 
-const matchesExistingRecord = (message, testThatExists = false) => async (value, options) => {
+const matchesExistingRecord = (defaultMessage, testThatExists = false) => async (value, options) => {
   if (!value) return;
-  let record
+
   const model = options.inModel
+  const message = options.message || defaultMessage
+
+  let record
 
   if (options.byAttribute) {
     const whereClauses = { [options.byAttribute]: value }
     record = await model.findOne({ where: whereClauses })
+  }  else if (options.scope) {
+    record = await model.findOne({ where: options.scope })
   } else {
     record = await model.findByPk(value)
   }
-
 
   if (testThatExists && !record) { return message }
   if (!testThatExists && record) { return message }

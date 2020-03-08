@@ -1,6 +1,8 @@
 import Model, { Sequelize } from '../Model'
 
 class User extends Model {
+  // When we implement more OAuth providers,
+  // we'll have multiple avatar sources too.
   avatarUrl() {
     return this.googleAvatarUrl
   }
