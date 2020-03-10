@@ -5,17 +5,19 @@ import resolveWithBA from './resolveWithBA.js'
 import AuthService from './AuthService'
 
 import LogInWithGoogle from './business_actions/LogInWithGoogle'
-import CreateTelemarketingSheet from './business_actions/CreateTelemarketingSheet'
+import FindOrCreateTelemarketingSheet from './business_actions/FindOrCreateTelemarketingSheet'
 import FindTelemarketingSheet from './business_actions/FindTelemarketingSheet'
+import ListTelemarketingSheets from './business_actions/ListTelemarketingSheets'
 
 const Server = new ApolloServer({
   resolvers: {
     Query: {
-      telemarketingSheet: resolveWithBA(FindTelemarketingSheet)
+      telemarketingSheet: resolveWithBA(FindTelemarketingSheet),
+      telemarketingSheets: resolveWithBA(ListTelemarketingSheets)
     },
     Mutation: {
       logInWithGoogle: resolveWithBA(LogInWithGoogle, { passingInput: true }),
-      createTelemarketingSheet: resolveWithBA(CreateTelemarketingSheet, { passingInput: true })
+      findOrCreateTelemarketingSheet: resolveWithBA(FindOrCreateTelemarketingSheet, { passingInput: true })
     }
   },
   typeDefs,

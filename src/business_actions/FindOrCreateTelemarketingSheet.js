@@ -1,7 +1,7 @@
 import BussinessAction from '../BusinessAction'
 import { TelemarketingSheet } from '../models'
 
-class CreateTelemarketingSheet extends BussinessAction {
+class FindOrCreateTelemarketingSheet extends BussinessAction {
   runPerformWithinTransaction = true
 
   validationConstraints = {
@@ -24,9 +24,16 @@ class CreateTelemarketingSheet extends BussinessAction {
   async executePerform() {
     const { countryCode, areaCode, firstNumbers } = this.params
     const UserId = this.performer.id
+    const attributes = { countryCode, areaCode, firstNumbers, UserId }
 
-    return await TelemarketingSheet.create({ countryCode, areaCode, firstNumbers, UserId })
+    const existingSheet = await TelemarketingSheet.findOne({ where: attributes })
+
+    if (existingSheet) {
+      return existingSheet
+    } else {
+      return await TelemarketingSheet.create(attributes)
+    }
   }
 }
 
-export default CreateTelemarketingSheet
+export default FindOrCreateTelemarketingSheet
