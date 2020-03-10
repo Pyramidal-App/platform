@@ -32,6 +32,12 @@ input CreateTelemarketingSheetInput {
   firstNumbers: String!
 }
 
+input FindTelemarketingSheetInput {
+  countryCode: String!
+  areaCode: String!
+  firstNumbers: String!
+}
+
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
   findOrCreateTelemarketingSheet(input: CreateTelemarketingSheetInput!): TelemarketingSheet!
@@ -39,6 +45,6 @@ type Mutation {
 
 type Query {
   listUsers: [User]
-  telemarketingSheet(firstNumbers: String!): TelemarketingSheet
+  telemarketingSheet(input: FindTelemarketingSheetInput!): TelemarketingSheet
   telemarketingSheets: [TelemarketingSheet]
 }

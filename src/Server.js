@@ -12,7 +12,7 @@ import ListTelemarketingSheets from './business_actions/ListTelemarketingSheets'
 const Server = new ApolloServer({
   resolvers: {
     Query: {
-      telemarketingSheet: resolveWithBA(FindTelemarketingSheet),
+      telemarketingSheet: resolveWithBA(FindTelemarketingSheet, { passingInput: true }),
       telemarketingSheets: resolveWithBA(ListTelemarketingSheets)
     },
     Mutation: {
