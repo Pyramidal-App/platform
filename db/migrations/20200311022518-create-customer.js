@@ -1,12 +1,16 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('TelemarketingSheets', {
+    return queryInterface.createTable('Customers', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
+      },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       UserId: {
         type: Sequelize.INTEGER,
@@ -15,18 +19,6 @@ module.exports = {
           model: 'Users',
           key: 'id'
         }
-      },
-      countryCode: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      areaCode: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      firstNumbers: {
-        type: Sequelize.INTEGER,
-        allowNull: false
       },
       createdAt: {
         allowNull: false,
@@ -39,6 +31,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('TelemarketingSheets');
+    return queryInterface.dropTable('Customers');
   }
 };

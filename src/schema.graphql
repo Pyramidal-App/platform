@@ -3,6 +3,32 @@ type User {
   name: String!
   email: String!
   avatarUrl: String
+  customers: [Customer]
+}
+
+type Customer {
+  id: ID!
+  phoneNumbers: [PhoneNumber]
+  addresses: [Address]
+  user: User!
+}
+
+type PhoneNumber {
+  id: ID!
+  customers: [Customer]
+  countryCode: String!
+  areaCode: String!
+  number: String!
+}
+
+type Address {
+  id: ID!
+  customer: Customer!
+  countryCode: String!
+  region: String!
+  locality: String!
+  streetAddress: String!
+  notes: String!
 }
 
 type TelemarketingSheet {
@@ -26,25 +52,46 @@ input LogInWithGoogleInput {
   idToken: String!
 }
 
-input CreateTelemarketingSheetInput {
+input TelemarketingSheetIdentifiers {
   countryCode: String!
   areaCode: String!
   firstNumbers: String!
 }
 
-input FindTelemarketingSheetInput {
+input PhoneNumberIdentifiers {
   countryCode: String!
   areaCode: String!
-  firstNumbers: String!
+  number: String!
+}
+
+input CreateAddressInput {
+  countryCode: String
+  region: String!
+  locality: String!
+  streetAddress: String!
+  notes: String!
+}
+
+input CreateCustomerInput {
+  name: String!
+  phoneNumberCountryCode: String!
+  phoneNumberAreaCode: String!
+  phoneNumber: String!
+  addressGooglePlaceId: String!
+  addressLabel: String!
+  addressNotes: String!
+  addressLat: Float!
+  addressLng: Float!
 }
 
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
-  findOrCreateTelemarketingSheet(input: CreateTelemarketingSheetInput!): TelemarketingSheet!
+  findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
+  createCustomer(input: CreateCustomerInput!): Customer
 }
 
 type Query {
   listUsers: [User]
-  telemarketingSheet(input: FindTelemarketingSheetInput!): TelemarketingSheet
+  telemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet
   telemarketingSheets: [TelemarketingSheet]
 }

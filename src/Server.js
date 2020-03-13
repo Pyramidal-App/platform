@@ -8,6 +8,7 @@ import LogInWithGoogle from './business_actions/LogInWithGoogle'
 import FindOrCreateTelemarketingSheet from './business_actions/FindOrCreateTelemarketingSheet'
 import FindTelemarketingSheet from './business_actions/FindTelemarketingSheet'
 import ListTelemarketingSheets from './business_actions/ListTelemarketingSheets'
+import CreateCustomer from './business_actions/CreateCustomer'
 
 const Server = new ApolloServer({
   resolvers: {
@@ -17,7 +18,8 @@ const Server = new ApolloServer({
     },
     Mutation: {
       logInWithGoogle: resolveWithBA(LogInWithGoogle, { passingInput: true }),
-      findOrCreateTelemarketingSheet: resolveWithBA(FindOrCreateTelemarketingSheet, { passingInput: true })
+      findOrCreateTelemarketingSheet: resolveWithBA(FindOrCreateTelemarketingSheet, { passingInput: true }),
+      createCustomer: resolveWithBA(CreateCustomer, { passingInput: true })
     }
   },
   typeDefs,

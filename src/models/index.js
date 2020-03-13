@@ -1,7 +1,29 @@
 import User from './User'
 import TelemarketingSheet from './TelemarketingSheet'
+import Customer from './Customer'
+import CustomersPhoneNumber from './CustomersPhoneNumber'
+import PhoneNumber from './PhoneNumber'
+import Address from './Address'
 
 User.hasMany(TelemarketingSheet)
+User.hasMany(Address)
+User.hasMany(Customer)
+
 TelemarketingSheet.belongsTo(User)
 
-export { User, TelemarketingSheet }
+Address.belongsTo(Customer)
+
+Customer.belongsTo(User)
+Customer.hasMany(CustomersPhoneNumber)
+
+CustomersPhoneNumber.belongsTo(Customer)
+CustomersPhoneNumber.belongsTo(PhoneNumber)
+
+export {
+  User,
+  TelemarketingSheet,
+  Customer,
+  CustomersPhoneNumber,
+  PhoneNumber,
+  Address
+}
