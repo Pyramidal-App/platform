@@ -3,10 +3,11 @@ import update from 'lodash.update'
 import validate from './validate'
 import { sequelize } from './db'
 
-const isPlainObject = obj => Object.prototype.toString.call(obj) === '[object Object]'
+const isPlainObject = obj =>
+  Object.prototype.toString.call(obj) === '[object Object]'
 
 class BusinesActionValidationError {
-  constructor(ba, errors) {
+  constructor (ba, errors) {
     this.name = 'BusinesActionValidationError'
     this.businessAction = ba
     this.errors = ba.errors
@@ -14,7 +15,7 @@ class BusinesActionValidationError {
 }
 
 class BusinesActionForbiddenError {
-  constructor(ba, errors) {
+  constructor (ba, errors) {
     this.name = 'BusinesActionForbiddenError'
     this.businessAction = ba
   }
@@ -28,7 +29,7 @@ class BusinessAction {
   validationConstraints = {}
   runPerformWithinTransaction = false
 
-  constructor(params, performer) {
+  constructor (params, performer) {
     this.params = params || {}
     this.performer = performer
 
@@ -36,7 +37,7 @@ class BusinessAction {
     this.valid = true
   }
 
-  async perform() {
+  async perform () {
     const valid = await this.validate()
     if (!valid) throw new BusinesActionValidationError(this)
 
@@ -52,10 +53,14 @@ class BusinessAction {
   }
 
   // You can overwrite these
-  executePerform() { throw 'You must define this' }
-  async isAllowed() { return true }
+  executePerform () {
+    throw 'You must define this'
+  }
+  async isAllowed () {
+    return true
+  }
 
-  async aroundPerform(executePerform) {
+  async aroundPerform (executePerform) {
     if (!this.runPerformWithinTransaction) return await executePerform()
 
     let result
@@ -64,9 +69,9 @@ class BusinessAction {
 
     try {
       result = await executePerform()
-    } catch(error) {
+    } catch (error) {
       this.transaction.rollback()
-      throw(error)
+      throw error
     }
 
     this.transaction.commit()
@@ -74,17 +79,17 @@ class BusinessAction {
     return result
   }
 
-  async validate() {
+  async validate () {
     try {
       await validate.async(this.params, this.validationConstraints)
-    } catch(errors) {
+    } catch (errors) {
       // The returned errors should be a plain object.
       // Otherwise it must be an error that was thrown while performing the validations
       // Validate.js interface is not very good...
       if (isPlainObject(errors)) {
         this.addErrorsPerField(null, errors)
       } else {
-        throw(errors)
+        throw errors
       }
     }
 
@@ -93,35 +98,30 @@ class BusinessAction {
     return this.valid
   }
 
-  hasErrors() {
-    return !!(
-      Object
-        .entries(this.errors)
-        .find(([field, errors]) => errors.length > 0 )
+  hasErrors () {
+    return !!Object.entries(this.errors).find(
+      ([field, errors]) => errors.length > 0
     )
   }
 
-  addError(path, error) {
+  addError (path, error) {
     if (!error) return
     update(this.errors, path, (errors = []) => [...errors, error])
   }
 
-  addErrors(path, errors) {
+  addErrors (path, errors) {
     if (!errors || errors.length === 0) return
     errors.forEach(e => this.addError(path, e))
   }
 
-  addErrorsPerField(path, errorsPerField) {
-    Object
-      .entries(errorsPerField)
-      .forEach(([field, errorMessages]) => {
-        const finalPath =
-          [path, field]
-            .filter(s => s !== '' && s !== undefined && s !== null)
-            .join('.')
+  addErrorsPerField (path, errorsPerField) {
+    Object.entries(errorsPerField).forEach(([field, errorMessages]) => {
+      const finalPath = [path, field]
+        .filter(s => s !== '' && s !== undefined && s !== null)
+        .join('.')
 
-        this.addErrors(finalPath, errorMessages)
-      })
+      this.addErrors(finalPath, errorMessages)
+    })
   }
 }
 

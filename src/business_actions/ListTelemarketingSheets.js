@@ -2,7 +2,7 @@ import BusinesAction from '../BusinessAction'
 import { TelemarketingSheet } from '../models'
 
 class ListTelemarketingSheets extends BusinesAction {
-  async executePerform() {
+  async executePerform () {
     return await TelemarketingSheet.findAll({
       where: { UserId: this.performer.id }
     })

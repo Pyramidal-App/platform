@@ -4,7 +4,10 @@ import { Customer, CustomersPhoneNumber, PhoneNumber, Address } from '../models'
 // If any of these attributes is pressent, all of them must be
 const allOrNone = (params, attributes) => {
   if (attributes.find(attr => params[attr])) {
-    return attributes.reduce((acc, attr) => ({ ...acc, [attr]: { presence: true }}), {})
+    return attributes.reduce(
+      (acc, attr) => ({ ...acc, [attr]: { presence: true } }),
+      {}
+    )
   }
 }
 
@@ -12,14 +15,14 @@ const allOrNone = (params, attributes) => {
 class CreateCustomer extends BusinessAction {
   runPerformWithinTransaction = true
 
-  get validationConstraints() {
+  get validationConstraints () {
     return {
       name: { presence: true },
 
       ...allOrNone(this.params, [
         'phoneNumberCountryCode',
         'phoneNumberAreaCode',
-        'phoneNumber',
+        'phoneNumber'
       ]),
 
       ...allOrNone(this.params, [
@@ -27,12 +30,12 @@ class CreateCustomer extends BusinessAction {
         'addressLabel',
         'addressNotes',
         'addressLat',
-        'addressLng',
+        'addressLng'
       ])
     }
   }
 
-  async executePerform() {
+  async executePerform () {
     const {
       name,
       phoneNumberCountryCode,
@@ -42,7 +45,7 @@ class CreateCustomer extends BusinessAction {
       addressLabel,
       addressNotes,
       addressLat,
-      addressLng,
+      addressLng
     } = this.params
 
     const customer = await Customer.create({

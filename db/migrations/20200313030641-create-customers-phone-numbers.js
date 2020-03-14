@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 const TABLE_NAME = 'CustomersPhoneNumbers'
 const UNIQUE_ATTRIBUTES = ['CustomerId', 'PhoneNumberId']
@@ -16,7 +16,7 @@ module.exports = {
       CustomerId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        refereces: {
+        references: {
           model: 'Customers',
           key: 'id'
         }
@@ -24,7 +24,7 @@ module.exports = {
       PhoneNumberId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        refereces: {
+        references: {
           model: 'PhoneNumbers',
           key: 'id'
         }
@@ -39,14 +39,13 @@ module.exports = {
       }
     })
 
-    await queryInterface.addConstraint(
-      TABLE_NAME,
-      UNIQUE_ATTRIBUTES,
-      { type: 'unique', name: CONSTRAINT_NAME }
-    )
+    await queryInterface.addConstraint(TABLE_NAME, UNIQUE_ATTRIBUTES, {
+      type: 'unique',
+      name: CONSTRAINT_NAME
+    })
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeConstraint(TABLE_NAME, CONSTRAINT_NAME)
     await queryInterface.dropTable(TABLE_NAME)
   }
-};
+}

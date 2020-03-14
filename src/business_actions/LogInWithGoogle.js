@@ -26,7 +26,7 @@ const findOrCreateUser = async ({ email, name, avatarUrl }) => {
 class LoginWithGoogle extends BusinessAction {
   runPerformWithinTransaction = true
 
-  async executePerform() {
+  async executePerform () {
     const { accessToken, idToken } = this.params
 
     const oAuth2Client = new OAuth2Client(
@@ -41,10 +41,10 @@ class LoginWithGoogle extends BusinessAction {
       id_token: idToken
     })
 
-    const result =
-      await oAuth2Client.request({
-        url: 'https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses,photos'
-      })
+    const result = await oAuth2Client.request({
+      url:
+        'https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses,photos'
+    })
 
     const {
       data: {

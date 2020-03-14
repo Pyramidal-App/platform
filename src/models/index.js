@@ -6,7 +6,6 @@ import PhoneNumber from './PhoneNumber'
 import Address from './Address'
 
 User.hasMany(TelemarketingSheet)
-User.hasMany(Address)
 User.hasMany(Customer)
 
 TelemarketingSheet.belongsTo(User)
@@ -14,10 +13,14 @@ TelemarketingSheet.belongsTo(User)
 Address.belongsTo(Customer)
 
 Customer.belongsTo(User)
+Customer.hasMany(Address)
 Customer.hasMany(CustomersPhoneNumber)
+Customer.belongsToMany(PhoneNumber, { through: CustomersPhoneNumber })
 
 CustomersPhoneNumber.belongsTo(Customer)
 CustomersPhoneNumber.belongsTo(PhoneNumber)
+
+PhoneNumber.hasMany(CustomersPhoneNumber)
 
 export {
   User,

@@ -8,10 +8,12 @@ class FindTelemarketingSheet extends BusinessAction {
     firstNumbers: { presence: true }
   }
 
-  async executePerform() {
+  async executePerform () {
     const { countryCode, areaCode, firstNumbers } = this.params
     const UserId = this.performer.id
-    return await TelemarketingSheet.findOne({ where: { UserId, countryCode, areaCode, firstNumbers }})
+    return await TelemarketingSheet.findOne({
+      where: { UserId, countryCode, areaCode, firstNumbers }
+    })
   }
 }
 

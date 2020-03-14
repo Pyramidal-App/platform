@@ -1,7 +1,14 @@
 import { UserInputError, ForbiddenError } from 'apollo-server'
-import { BusinesActionValidationError, BusinesActionForbiddenError } from './BusinessAction'
+import {
+  BusinesActionValidationError,
+  BusinesActionForbiddenError
+} from './BusinessAction'
 
-const resolveWithBA = (BA, { passingInput } = {}) => async (_root, args, { currentUser }) => {
+const resolveWithBA = (BA, { passingInput } = {}) => async (
+  _root,
+  args,
+  { currentUser }
+) => {
   const params = passingInput ? args.input : args
 
   try {

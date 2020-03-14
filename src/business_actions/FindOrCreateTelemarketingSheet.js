@@ -21,12 +21,14 @@ class FindOrCreateTelemarketingSheet extends BussinessAction {
     }
   }
 
-  async executePerform() {
+  async executePerform () {
     const { countryCode, areaCode, firstNumbers } = this.params
     const UserId = this.performer.id
     const attributes = { countryCode, areaCode, firstNumbers, UserId }
 
-    const existingSheet = await TelemarketingSheet.findOne({ where: attributes })
+    const existingSheet = await TelemarketingSheet.findOne({
+      where: attributes
+    })
 
     if (existingSheet) {
       return existingSheet

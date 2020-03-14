@@ -24,10 +24,10 @@ type PhoneNumber {
 type Address {
   id: ID!
   customer: Customer!
-  countryCode: String!
-  region: String!
-  locality: String!
-  streetAddress: String!
+  label: String!
+  googlePlaceId: String!
+  lat: Float!
+  lng: Float!
   notes: String!
 }
 
@@ -86,7 +86,9 @@ input CreateCustomerInput {
 
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
-  findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
+  findOrCreateTelemarketingSheet(
+    input: TelemarketingSheetIdentifiers!
+  ): TelemarketingSheet!
   createCustomer(input: CreateCustomerInput!): Customer
 }
 
@@ -94,4 +96,5 @@ type Query {
   listUsers: [User]
   telemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet
   telemarketingSheets: [TelemarketingSheet]
+  customer(input: PhoneNumberIdentifiers!): Customer
 }

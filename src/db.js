@@ -4,7 +4,7 @@ import Sequelize from 'sequelize'
 
 import allConfig from '../db/config'
 
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || 'development'
 const config = allConfig[env]
 
 const sequelize = new Sequelize(

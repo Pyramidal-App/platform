@@ -14,4 +14,3 @@ CustomersPhoneNumber.init({
 })
 
 export default CustomersPhoneNumber
-
