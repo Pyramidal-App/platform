@@ -56,6 +56,7 @@ class BusinessAction {
   executePerform () {
     throw 'You must define this'
   }
+
   async isAllowed () {
     return true
   }

@@ -11,16 +11,24 @@ class FindCustomer extends BusinessAction {
   async executePerform () {
     const { countryCode, areaCode, number } = this.params
 
-    return await Customer.findOne({
+    const customer = await Customer.findOne({
       include: [
         {
           model: PhoneNumber,
           required: true,
-          where: { countryCode: '54', areaCode: '11', number: '12312305' }
+          where: { countryCode, areaCode, number }
         },
-        { model: PhoneNumber }
+        { model: Address }
       ]
     })
+
+    // TODO: implement a proper field resolver
+    return customer && {
+      ...customer.dataValues,
+      id: customer.id,
+      addresses: customer.Addresses,
+      phoneNumbers: customer.PhoneNumbers
+    }
   }
 }
 

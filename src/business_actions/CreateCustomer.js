@@ -28,7 +28,6 @@ class CreateCustomer extends BusinessAction {
       ...allOrNone(this.params, [
         'addressGooglePlaceId',
         'addressLabel',
-        'addressNotes',
         'addressLat',
         'addressLng'
       ])
@@ -48,10 +47,7 @@ class CreateCustomer extends BusinessAction {
       addressLng
     } = this.params
 
-    const customer = await Customer.create({
-      UserId: this.performer.id,
-      name
-    })
+    const customer = await Customer.create({ UserId: this.performer.id, name })
 
     const [dbPhoneNumber] = await PhoneNumber.findOrCreate({
       where: {
