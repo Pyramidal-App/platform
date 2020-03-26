@@ -37,6 +37,14 @@ type TelemarketingSheet {
   countryCode: Int!
   areaCode: Int!
   firstNumbers: Int!
+  numberInfo: [TelemarketingSheetNumberInfo!]!
+}
+
+type TelemarketingSheetNumberInfo {
+  lastNumbers: Int!
+  hasContact: Boolean!
+  hasPendingTasks: Boolean!
+  dontCall: Boolean!
 }
 
 type UserAndToken {

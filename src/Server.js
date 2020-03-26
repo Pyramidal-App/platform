@@ -1,5 +1,7 @@
 import { ApolloServer, gql } from 'apollo-server'
-import { Customer } from './models'
+import { Customer, PhoneNumber } from './models'
+import { Op } from 'sequelize'
+import times from 'lodash.times'
 
 import typeDefs from './schema.graphql'
 import resolveWithBA from './resolveWithBA.js'
@@ -32,7 +34,31 @@ const Server = new ApolloServer({
     Customer: {
       phoneNumbers: async customer => await new Customer({ id: customer.id }).getPhoneNumbers(),
       addresses: async customer => await new Customer({ id: customer.id }).getAddresses()
+    },
+    TelemarketingSheet: {
+      numberInfo: async sheet => {
+        const { countryCode, areaCode, firstNumbers } = sheet.dataValues
+
+        const phoneNumbersWithContact = await PhoneNumber.findAll({
+          where: {
+            countryCode,
+            areaCode,
+            number: { [Op.iRegexp]: `^${firstNumbers}` }
+          },
+          include: [{ model: Customer, isRequired: true }]
+        })
+
+        return times(100, n => {
+          const lastNumbers = n.toString().padStart(2, '0')
+          const hasContact = !!phoneNumbersWithContact.find(pn => pn.number.slice(-2) === lastNumbers)
+          const hasPendingTasks = false
+          const dontCall = false
+
+          return { lastNumbers, hasContact, hasPendingTasks, dontCall }
+        })
+      }
     }
+
   },
   context: async ({ req }) => {
     const token = req.headers.authorization

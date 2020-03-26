@@ -21,6 +21,7 @@ CustomersPhoneNumber.belongsTo(Customer)
 CustomersPhoneNumber.belongsTo(PhoneNumber)
 
 PhoneNumber.hasMany(CustomersPhoneNumber)
+PhoneNumber.belongsToMany(Customer, { through: CustomersPhoneNumber })
 
 export {
   User,

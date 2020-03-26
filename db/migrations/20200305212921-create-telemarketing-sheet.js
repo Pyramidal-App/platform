@@ -17,15 +17,15 @@ module.exports = {
         }
       },
       countryCode: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
       },
       areaCode: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
       },
       firstNumbers: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
       },
       createdAt: {
