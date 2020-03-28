@@ -14,7 +14,8 @@ PhoneNumber.init({
   number: {
     type: Sequelize.STRING,
     allowNull: false
-  }
+  },
+  dontCall: Sequelize.BOOLEAN
 })
 
 export default PhoneNumber

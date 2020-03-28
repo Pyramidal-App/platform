@@ -1,8 +1,8 @@
 import { ApolloServer, gql } from 'apollo-server'
-import { Customer, PhoneNumber } from './models'
 import { Op } from 'sequelize'
 import times from 'lodash.times'
 
+import { Customer, PhoneNumber } from './models'
 import typeDefs from './schema.graphql'
 import resolveWithBA from './resolveWithBA.js'
 import AuthService from './AuthService'
@@ -15,8 +15,17 @@ import CreateCustomer from './business_actions/CreateCustomer'
 import FindCustomer from './business_actions/FindCustomer'
 import UpdateCustomer from './business_actions/UpdateCustomer'
 import UpdateAddress from './business_actions/UpdateAddress'
+import CreateCall from './business_actions/CreateCall'
 
 const Server = new ApolloServer({
+  context: async ({ req }) => {
+    const token = req.headers.authorization
+
+    if (token) {
+      const currentUser = await AuthService.getUser(token)
+      return { currentUser }
+    }
+  },
   typeDefs,
   resolvers: {
     Query: {
@@ -29,7 +38,8 @@ const Server = new ApolloServer({
       findOrCreateTelemarketingSheet: resolveWithBA(FindOrCreateTelemarketingSheet, { passingInput: true }),
       createCustomer: resolveWithBA(CreateCustomer, { passingInput: true }),
       updateCustomer: resolveWithBA(UpdateCustomer, { passingInput: true }),
-      updateAddress: resolveWithBA(UpdateAddress, { passingInput: true })
+      updateAddress: resolveWithBA(UpdateAddress, { passingInput: true }),
+      createCall: resolveWithBA(CreateCall, { passingInput: true })
     },
     Customer: {
       phoneNumbers: async customer => await new Customer({ id: customer.id }).getPhoneNumbers(),
@@ -57,15 +67,6 @@ const Server = new ApolloServer({
           return { lastNumbers, hasContact, hasPendingTasks, dontCall }
         })
       }
-    }
-
-  },
-  context: async ({ req }) => {
-    const token = req.headers.authorization
-
-    if (token) {
-      const currentUser = await AuthService.getUser(token)
-      return { currentUser }
     }
   }
 })

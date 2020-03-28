@@ -1,3 +1,10 @@
+enum CallOutcome {
+  DIDNT_ANSWER
+  NOT_INTERESTED
+  SUCCESS
+  DONT_CALL
+}
+
 type User {
   id: ID!
   name: String!
@@ -6,109 +13,136 @@ type User {
   customers: [Customer]!
 }
 
-type Customer {
-  id: ID!
-  name: String!
-  phoneNumbers: [PhoneNumber]!
-  addresses: [Address]!
-  user: User!
-}
+  type Customer {
+    id: ID!
+    name: String!
+    phoneNumbers: [PhoneNumber]!
+    addresses: [Address]!
+    user: User!
+  }
 
-type PhoneNumber {
-  id: ID!
-  customers: [Customer]!
-  countryCode: String!
-  areaCode: String!
-  number: String!
-}
+  type PhoneNumber {
+    id: ID!
+    customers: [Customer]!
+    countryCode: String!
+    areaCode: String!
+    number: String!
+  }
 
-type Address {
-  id: ID!
-  customer: Customer!
-  label: String!
-  googlePlaceId: String!
-  lat: Float!
-  lng: Float!
-  notes: String!
-}
+  type Address {
+    id: ID!
+    customer: Customer!
+    label: String!
+    googlePlaceId: String!
+    lat: Float!
+    lng: Float!
+    notes: String!
+  }
 
-type TelemarketingSheet {
-  id: ID!
-  countryCode: Int!
-  areaCode: Int!
-  firstNumbers: Int!
-  numberInfo: [TelemarketingSheetNumberInfo!]!
-}
+  type TelemarketingSheet {
+    id: ID!
+    countryCode: Int!
+    areaCode: Int!
+    firstNumbers: Int!
+    numberInfo: [TelemarketingSheetNumberInfo!]!
+  }
 
-type TelemarketingSheetNumberInfo {
-  lastNumbers: Int!
-  hasContact: Boolean!
-  hasPendingTasks: Boolean!
-  dontCall: Boolean!
-}
+  type TelemarketingSheetNumberInfo {
+    lastNumbers: Int!
+    hasContact: Boolean!
+    hasPendingTasks: Boolean!
+    dontCall: Boolean!
+  }
 
-type UserAndToken {
-  token: String!
-  user: User!
-}
+  type Call {
+    id: ID!
+    phoneNumber: PhoneNumber!
+    customer: Customer!
+    notes: [Note]!
+    outcome: CallOutcome
+    dateTime: String!
+  }
 
-type GenericActionResponse {
-  success: Boolean!
-}
+  type Note {
+    user: User!
+    customer: Customer
+    phoneNumber: PhoneNumber
+    call: Call
+    body: String!
+  }
 
-input LogInWithGoogleInput {
-  accessToken: String!
-  idToken: String!
-}
+  type UserAndToken {
+    token: String!
+    user: User!
+  }
 
-input TelemarketingSheetIdentifiers {
-  countryCode: String!
-  areaCode: String!
-  firstNumbers: String!
-}
+  type GenericActionResponse {
+    success: Boolean!
+  }
 
-input PhoneNumberIdentifiers {
-  countryCode: String!
-  areaCode: String!
-  number: String!
-}
+  input LogInWithGoogleInput {
+    accessToken: String!
+    idToken: String!
+  }
 
-input CreateCustomerInput {
-  name: String!
-  phoneNumberCountryCode: String!
-  phoneNumberAreaCode: String!
-  phoneNumber: String!
-  addressGooglePlaceId: String!
-  addressLabel: String!
-  addressNotes: String
-  addressLat: Float!
-  addressLng: Float!
-}
+  input TelemarketingSheetIdentifiers {
+    countryCode: String!
+    areaCode: String!
+    firstNumbers: String!
+  }
 
-input UpdateCustomerInput {
-  id: ID!
-  name: String!
-}
+  input PhoneNumberIdentifiers {
+    countryCode: String!
+    areaCode: String!
+    number: String!
+  }
 
-input UpdateAddressInput {
-  id: ID!
-  googlePlaceId: String
-  label: String
-  notes: String
-  lat: Float
-  lng: Float
+  input CreateCustomerInput {
+    name: String!
+    phoneNumberCountryCode: String!
+    phoneNumberAreaCode: String!
+    phoneNumber: String!
+    addressGooglePlaceId: String!
+    addressLabel: String!
+    addressNotes: String
+    addressLat: Float!
+    addressLng: Float!
+  }
+
+  input UpdateCustomerInput {
+    id: ID!
+    name: String!
+  }
+
+  input UpdateAddressInput {
+    id: ID!
+    googlePlaceId: String
+    label: String
+    notes: String
+    lat: Float
+    lng: Float
+  }
+
+  input CreateCallInput {
+    phoneNumberId: ID!
+    customerId: ID!
+    notes: String!
+    outcome: CallOutcome!
+    dateTime: String!
 }
 
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
   findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
-  createCustomer(input: CreateCustomerInput!): Customer
-  updateCustomer(input: UpdateCustomerInput!): Customer
-  updateAddress(input: UpdateAddressInput!): Address
+  createCustomer(input: CreateCustomerInput!): Customer!
+  updateCustomer(input: UpdateCustomerInput!): Customer!
+  updateAddress(input: UpdateAddressInput!): Address!
+  createCall(input: CreateCallInput!): Call
 }
 
 type Query {
   telemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet
   telemarketingSheets: [TelemarketingSheet]
-  customer(input: PhoneNumberIdentifiers!): Customer
+  customer(input: PhoneNumberIdentifiers!): Customer!
 }
+

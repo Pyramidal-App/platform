@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon -w src -e js,graphql -x babel-node src/index.js",
-    "console": "babel-node"
+    "console": "babel-node",
+    "seq": "sequelize-cli"
   },
   "dependencies": {
     "apollo-server": "^2.11.0",
