@@ -2,7 +2,7 @@ import { ApolloServer, gql } from 'apollo-server'
 import { Op } from 'sequelize'
 import times from 'lodash.times'
 
-import { Customer, PhoneNumber } from './models'
+import { Customer, Call, PhoneNumber, User } from './models'
 import typeDefs from './schema.graphql'
 import resolveWithBA from './resolveWithBA.js'
 import AuthService from './AuthService'
@@ -31,7 +31,7 @@ const Server = new ApolloServer({
     Query: {
       telemarketingSheet: resolveWithBA(FindTelemarketingSheet, { passingInput: true }),
       telemarketingSheets: resolveWithBA(ListTelemarketingSheets),
-      customer: resolveWithBA(FindCustomer, { passingInput: true }),
+      customer: resolveWithBA(FindCustomer, { passingInput: true })
     },
     Mutation: {
       logInWithGoogle: resolveWithBA(LogInWithGoogle, { passingInput: true }),
@@ -43,7 +43,21 @@ const Server = new ApolloServer({
     },
     Customer: {
       phoneNumbers: async customer => await new Customer({ id: customer.id }).getPhoneNumbers(),
-      addresses: async customer => await new Customer({ id: customer.id }).getAddresses()
+      addresses: async customer => await new Customer({ id: customer.id }).getAddresses(),
+      calls: async customer => await new Customer({ id: customer.id }).getCalls(),
+    },
+    Call: {
+      user: async call => {
+        // TODO: for some reason this is not working, returning null.
+        // We should investigate it, and maybe open a bug in sequelize
+        //const user = await new Call({ id: call.id }).getUser()
+        return await User.findOne({ where: { id: call.UserId } })
+      },
+      notes: async call => await new Call({ id: call.id }).getNotes(),
+
+      // TODO: introduce a global solution for datetime types.
+      // We can use a custom Scalar.
+      dateTime: call => call.dateTime.toISOString()
     },
     TelemarketingSheet: {
       numberInfo: async sheet => {
@@ -67,7 +81,7 @@ const Server = new ApolloServer({
           return { lastNumbers, hasContact, hasPendingTasks, dontCall }
         })
       }
-    }
+    },
   }
 })
 

@@ -14,7 +14,6 @@ class CreateCall extends BusinessAction {
   validationConstraints = {
     phoneNumberId: { presence: true },
     customerId: { presence: true },
-    notes: { presence: true },
     outcome: { presence: true, inclusion: OUTCOMES },
     dateTime: { presence: true }
   }
@@ -37,7 +36,7 @@ class CreateCall extends BusinessAction {
 
     // Associate with as many entities as possible,
     // so we can later display notes related to each entity by separate.
-    await Note.create({
+    notes && await Note.create({
       UserId: this.performer.id,
       CustomerId: customerId,
       CallId: call.id,
