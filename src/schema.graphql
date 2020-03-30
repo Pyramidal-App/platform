@@ -5,6 +5,18 @@ enum CallOutcome {
   DONT_CALL
 }
 
+enum TaskType {
+  CALL
+  VISIT
+}
+
+enum TaskStatus {
+  PENDING
+  COMPLETED
+  OVERDUE
+  CANCELLED
+}
+
 type User {
   id: ID!
   name: String!
@@ -20,6 +32,7 @@ type Customer {
   phoneNumbers: [PhoneNumber]!
   addresses: [Address]!
   calls: [Call]!
+  tasks: [Task]!
 }
 
 type PhoneNumber {
@@ -66,11 +79,22 @@ type Call {
 }
 
 type Note {
+  id: ID!
   user: User!
   customer: Customer
   phoneNumber: PhoneNumber
   call: Call
   body: String!
+}
+
+type Task {
+  id: ID!
+  customer: Customer!
+  user: User!
+  triggererCall: Call!
+  taskType: TaskType!
+  dueDate: String!
+  status: TaskStatus!
 }
 
 type UserAndToken {
@@ -133,13 +157,21 @@ input CreateCallInput {
   notes: String
 }
 
+input CreateTaskInput {
+  customerId: ID!
+  triggererCallId: ID!
+  taskType: TaskType!
+  dueDate: String
+}
+
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
   findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
   createCustomer(input: CreateCustomerInput!): Customer!
   updateCustomer(input: UpdateCustomerInput!): Customer!
   updateAddress(input: UpdateAddressInput!): Address!
-  createCall(input: CreateCallInput!): Call
+  createCall(input: CreateCallInput!): Call!
+  createTask(input: CreateTaskInput!): Task!
 }
 
 type Query {

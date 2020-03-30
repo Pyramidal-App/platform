@@ -6,10 +6,12 @@ import PhoneNumber from './PhoneNumber'
 import Address from './Address'
 import Call from './Call'
 import Note from './Note'
+import Task from './Task'
 
 User.hasMany(TelemarketingSheet)
 User.hasMany(Customer)
 User.hasMany(Call)
+User.hasMany(Task)
 
 TelemarketingSheet.belongsTo(User)
 
@@ -19,6 +21,7 @@ Customer.belongsTo(User)
 Customer.hasMany(Address)
 Customer.hasMany(CustomersPhoneNumber)
 Customer.hasMany(Call)
+Customer.hasMany(Task)
 Customer.belongsToMany(PhoneNumber, { through: CustomersPhoneNumber })
 
 CustomersPhoneNumber.belongsTo(Customer)
@@ -32,11 +35,16 @@ Call.belongsTo(User)
 Call.belongsTo(Customer)
 Call.belongsTo(PhoneNumber)
 Call.hasMany(Note)
+Call.hasMany(Task, { as: 'triggeredCalls', foreignKey: 'TriggererCallId' })
 
 Note.belongsTo(User)
 Note.belongsTo(Customer)
 Note.belongsTo(PhoneNumber)
 Note.belongsTo(Call)
+
+Task.belongsTo(User)
+Task.belongsTo(Customer)
+Task.belongsTo(Call, { as: 'triggererCall', foreignKey: 'TriggererCallId' })
 
 export {
   User,
@@ -46,5 +54,6 @@ export {
   PhoneNumber,
   Address,
   Call,
-  Note
+  Note,
+  Task
 }

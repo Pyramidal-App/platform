@@ -3,47 +3,46 @@
 const createEnum = require('../helpers/createEnum')
 const dropType = require('../helpers/dropType')
 
-const ENUM_NAME = 'call_outcome'
-const ENUM_VALUES = [
-  'DIDNT_ANSWER',
-  'NOT_INTERESTED',
-  'SUCCESS',
-  'DONT_CALL'
-]
+const TYPE_ENUM = 'task_type'
+const STATUS_ENUM = 'task_status'
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await createEnum(queryInterface, ENUM_NAME, ENUM_VALUES)
+    await createEnum(queryInterface, TYPE_ENUM, ['CALL', 'VISIT'])
+    await createEnum(queryInterface, STATUS_ENUM, ['PENDING', 'COMPLETED', 'CANCELLED', 'OVERDUE'])
 
-    await queryInterface.createTable('Calls', {
+    await queryInterface.createTable('Tasks', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      outcome: {
-        type: ENUM_NAME,
-        allowNull: false,
-      },
-      dateTime: {
-        type: Sequelize.DATE,
+      taskType: {
+        type: TYPE_ENUM,
         allowNull: false
       },
-      PhoneNumberId: {
+      dueDate: {
+        type: Sequelize.DATE
+      },
+      UserId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'PhoneNumbers', key: 'id' }
+        references: { model: 'Users', key: 'id' }
       },
       CustomerId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: 'Customers', key: 'id' }
       },
-      UserId: {
+      TriggererCallId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'Users', key: 'id' }
+        references: { model: 'Calls', key: 'id' }
+      },
+      status: {
+        type: STATUS_ENUM,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
@@ -56,7 +55,8 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Calls');
-    await dropType(queryInterface, ENUM_NAME)
+    await queryInterface.dropTable('Tasks');
+    await dropType(queryInterface, TYPE_ENUM)
+    await dropType(queryInterface, STATUS_ENUM)
   }
 };

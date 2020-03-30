@@ -2,7 +2,7 @@ import { ApolloServer, gql } from 'apollo-server'
 import { Op } from 'sequelize'
 import times from 'lodash.times'
 
-import { Customer, Call, PhoneNumber, User } from './models'
+import { Customer, Call, PhoneNumber, User, Task } from './models'
 import typeDefs from './schema.graphql'
 import resolveWithBA from './resolveWithBA.js'
 import AuthService from './AuthService'
@@ -16,6 +16,7 @@ import FindCustomer from './business_actions/FindCustomer'
 import UpdateCustomer from './business_actions/UpdateCustomer'
 import UpdateAddress from './business_actions/UpdateAddress'
 import CreateCall from './business_actions/CreateCall'
+import CreateTask from './business_actions/CreateTask'
 
 const Server = new ApolloServer({
   context: async ({ req }) => {
@@ -39,25 +40,33 @@ const Server = new ApolloServer({
       createCustomer: resolveWithBA(CreateCustomer, { passingInput: true }),
       updateCustomer: resolveWithBA(UpdateCustomer, { passingInput: true }),
       updateAddress: resolveWithBA(UpdateAddress, { passingInput: true }),
-      createCall: resolveWithBA(CreateCall, { passingInput: true })
+      createCall: resolveWithBA(CreateCall, { passingInput: true }),
+      createTask: resolveWithBA(CreateTask, { passingInput: true })
     },
     Customer: {
       phoneNumbers: async customer => await new Customer({ id: customer.id }).getPhoneNumbers(),
       addresses: async customer => await new Customer({ id: customer.id }).getAddresses(),
       calls: async customer => await new Customer({ id: customer.id }).getCalls(),
+      tasks: async customer => await new Customer({ id: customer.id }).getTasks(),
     },
     Call: {
       user: async call => {
         // TODO: for some reason this is not working, returning null.
         // We should investigate it, and maybe open a bug in sequelize
         //const user = await new Call({ id: call.id }).getUser()
-        return await User.findOne({ where: { id: call.UserId } })
+        return await User.findByPk(call.UserId)
       },
       notes: async call => await new Call({ id: call.id }).getNotes(),
 
       // TODO: introduce a global solution for datetime types.
       // We can use a custom Scalar.
       dateTime: call => call.dateTime.toISOString()
+    },
+    Task: {
+      // TODO: same as with Call.user resolver
+      user: async task => await User.findByPk(task.UserId),
+      // TODO: same as with Call.dateTime resolver
+      dueDate: task => task.dueDate.toISOString()
     },
     TelemarketingSheet: {
       numberInfo: async sheet => {
