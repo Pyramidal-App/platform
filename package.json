@@ -9,6 +9,7 @@
     "seq": "sequelize-cli"
   },
   "dependencies": {
+    "apollo-log": "^0.1.0",
     "apollo-server": "^2.11.0",
     "continuation-local-storage": "^3.2.1",
     "google-auth-library": "^5.10.1",

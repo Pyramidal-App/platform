@@ -1,3 +1,4 @@
+import { ApolloLogExtension } from 'apollo-log'
 import { ApolloServer, gql } from 'apollo-server'
 import { Op } from 'sequelize'
 import times from 'lodash.times'
@@ -21,6 +22,7 @@ import CreateTeam from './business_actions/CreateTeam'
 import InviteToTeam from './business_actions/InviteToTeam'
 
 const Server = new ApolloServer({
+  extensions: [_ => new ApolloLogExtension()],
   context: async ({ req }) => {
     const token = req.headers.authorization
 
