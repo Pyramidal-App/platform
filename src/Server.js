@@ -20,6 +20,7 @@ import CreateCall from './business_actions/CreateCall'
 import CreateTask from './business_actions/CreateTask'
 import CreateTeam from './business_actions/CreateTeam'
 import InviteToTeam from './business_actions/InviteToTeam'
+import UpdateCurrentUser from './business_actions/UpdateCurrentUser'
 
 const Server = new ApolloServer({
   extensions: [_ => new ApolloLogExtension()],
@@ -48,7 +49,8 @@ const Server = new ApolloServer({
       createCall: resolveWithBA(CreateCall),
       createTask: resolveWithBA(CreateTask),
       createTeam: resolveWithBA(CreateTeam),
-      inviteToTeam: resolveWithBA(InviteToTeam)
+      inviteToTeam: resolveWithBA(InviteToTeam),
+      updateCurrentUser: resolveWithBA(UpdateCurrentUser)
     },
     Customer: {
       phoneNumbers: async customer => await new Customer({ id: customer.id }).getPhoneNumbers(),

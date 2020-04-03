@@ -9,7 +9,7 @@ const GOOGLE_OAUTH_SECRET = process.env.GOOGLE_OAUTH_SECRET
 const HOST = process.env.FRONT_HOST || 'localhost:8080'
 
 const findOrCreateUser = async ({ email, name, avatarUrl }) => {
-  const existingUser = await User.findOne({ email })
+  const existingUser = await User.findOne({ where: { email } })
 
   if (existingUser) {
     existingUser.name = name
