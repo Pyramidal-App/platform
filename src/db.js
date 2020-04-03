@@ -1,8 +1,12 @@
 import { readFileSync } from 'fs'
 import path from 'path'
 import Sequelize from 'sequelize'
+import cls from 'continuation-local-storage'
 
 import allConfig from '../db/config'
+
+// Allows automatic passing transaction
+Sequelize.useCLS(cls.createNamespace('pyramidal_platform'))
 
 const env = process.env.NODE_ENV || 'development'
 const config = allConfig[env]

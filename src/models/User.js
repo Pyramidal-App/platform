@@ -9,10 +9,13 @@ class User extends Model {
 }
 
 User.init({
-  name: {
-    type: Sequelize.STRING,
-    allowNull: false
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    allowNull: false,
+    autoIncrement: true
   },
+  name: Sequelize.STRING,
   email: {
     type: Sequelize.STRING,
     allowNull: false,

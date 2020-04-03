@@ -2,7 +2,7 @@ import { ApolloServer, gql } from 'apollo-server'
 import { Op } from 'sequelize'
 import times from 'lodash.times'
 
-import { Customer, Call, PhoneNumber, User, Task } from './models'
+import { Customer, Call, PhoneNumber, User, Task, Team, TeamMembership } from './models'
 import typeDefs from './schema.graphql'
 import resolveWithBA from './resolveWithBA.js'
 import AuthService from './AuthService'
@@ -17,6 +17,8 @@ import UpdateCustomer from './business_actions/UpdateCustomer'
 import UpdateAddress from './business_actions/UpdateAddress'
 import CreateCall from './business_actions/CreateCall'
 import CreateTask from './business_actions/CreateTask'
+import CreateTeam from './business_actions/CreateTeam'
+import InviteToTeam from './business_actions/InviteToTeam'
 
 const Server = new ApolloServer({
   context: async ({ req }) => {
@@ -30,18 +32,21 @@ const Server = new ApolloServer({
   typeDefs,
   resolvers: {
     Query: {
-      telemarketingSheet: resolveWithBA(FindTelemarketingSheet, { passingInput: true }),
-      telemarketingSheets: resolveWithBA(ListTelemarketingSheets),
-      customer: resolveWithBA(FindCustomer, { passingInput: true })
+      telemarketingSheet: resolveWithBA(FindTelemarketingSheet),
+      telemarketingSheets: resolveWithBA(ListTelemarketingSheets, { passingInput: false }),
+      customer: resolveWithBA(FindCustomer),
+      currentUser: (_root, _args, { currentUser }) => currentUser
     },
     Mutation: {
-      logInWithGoogle: resolveWithBA(LogInWithGoogle, { passingInput: true }),
-      findOrCreateTelemarketingSheet: resolveWithBA(FindOrCreateTelemarketingSheet, { passingInput: true }),
-      createCustomer: resolveWithBA(CreateCustomer, { passingInput: true }),
-      updateCustomer: resolveWithBA(UpdateCustomer, { passingInput: true }),
-      updateAddress: resolveWithBA(UpdateAddress, { passingInput: true }),
-      createCall: resolveWithBA(CreateCall, { passingInput: true }),
-      createTask: resolveWithBA(CreateTask, { passingInput: true })
+      logInWithGoogle: resolveWithBA(LogInWithGoogle),
+      findOrCreateTelemarketingSheet: resolveWithBA(FindOrCreateTelemarketingSheet),
+      createCustomer: resolveWithBA(CreateCustomer),
+      updateCustomer: resolveWithBA(UpdateCustomer),
+      updateAddress: resolveWithBA(UpdateAddress),
+      createCall: resolveWithBA(CreateCall),
+      createTask: resolveWithBA(CreateTask),
+      createTeam: resolveWithBA(CreateTeam),
+      inviteToTeam: resolveWithBA(InviteToTeam)
     },
     Customer: {
       phoneNumbers: async customer => await new Customer({ id: customer.id }).getPhoneNumbers(),
@@ -50,20 +55,13 @@ const Server = new ApolloServer({
       tasks: async customer => await new Customer({ id: customer.id }).getTasks(),
     },
     Call: {
-      user: async call => {
-        // TODO: for some reason this is not working, returning null.
-        // We should investigate it, and maybe open a bug in sequelize
-        //const user = await new Call({ id: call.id }).getUser()
-        return await User.findByPk(call.UserId)
-      },
+      user: async call => await User.findByPk(call.UserId),
       notes: async call => await new Call({ id: call.id }).getNotes(),
-
       // TODO: introduce a global solution for datetime types.
       // We can use a custom Scalar.
       dateTime: call => call.dateTime.toISOString()
     },
     Task: {
-      // TODO: same as with Call.user resolver
       user: async task => await User.findByPk(task.UserId),
       // TODO: same as with Call.dateTime resolver
       dueDate: task => task.dueDate.toISOString()
@@ -91,6 +89,18 @@ const Server = new ApolloServer({
         })
       }
     },
+    User: {
+      team: async user => {
+        const teams = await new User({ id: user.id }).getTeams()
+        return teams[0]
+      }
+    },
+    Team: {
+      memberships: async team => await new Team({ id: team.id }).getMemberships()
+    },
+    TeamMembership: {
+      user: async membership => await User.findByPk(membership.UserId)
+    }
   }
 })
 

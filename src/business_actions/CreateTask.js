@@ -12,6 +12,7 @@ class CreateTask extends BusinessAction {
 
   async executePerform() {
     const { customerId, triggererCallId, taskType, dueDate } = this.params
+    const transaction = this.transaction
 
     return await Task.create({
       taskType,
@@ -20,7 +21,7 @@ class CreateTask extends BusinessAction {
       CustomerId: customerId,
       TriggererCallId: triggererCallId,
       status: 'PENDING'
-    })
+    }, { transaction })
   }
 }
 

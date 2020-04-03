@@ -19,10 +19,11 @@ enum TaskStatus {
 
 type User {
   id: ID!
-  name: String!
+  name: String
   email: String!
   avatarUrl: String
   customers: [Customer]!
+  team: Team
 }
 
 type Customer {
@@ -97,6 +98,20 @@ type Task {
   status: TaskStatus!
 }
 
+type Team {
+  id: ID!
+  name: String!
+  memberships: [TeamMembership]!
+  members: [User]!
+}
+
+type TeamMembership {
+  id: ID!
+  team: Team!
+  user: User!
+  admin: Boolean
+}
+
 type UserAndToken {
   token: String!
   user: User!
@@ -164,6 +179,16 @@ input CreateTaskInput {
   dueDate: String
 }
 
+input CreateTeamInput {
+  name: String!
+  members: String!
+}
+
+input InviteToTeamInput {
+  teamId: ID!
+  email: String!
+}
+
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
   findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
@@ -172,11 +197,14 @@ type Mutation {
   updateAddress(input: UpdateAddressInput!): Address!
   createCall(input: CreateCallInput!): Call!
   createTask(input: CreateTaskInput!): Task!
+  createTeam(input: CreateTeamInput!): Team!
+  inviteToTeam(input: InviteToTeamInput!): TeamMembership!
 }
 
 type Query {
   telemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet
   telemarketingSheets: [TelemarketingSheet]
   customer(input: PhoneNumberIdentifiers!): Customer
+  currentUser: User
 }
 

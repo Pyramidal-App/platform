@@ -24,10 +24,9 @@ const findOrCreateUser = async ({ email, name, avatarUrl }) => {
 }
 
 class LoginWithGoogle extends BusinessAction {
-  runPerformWithinTransaction = true
-
   async executePerform () {
     const { accessToken, idToken } = this.params
+    const transaction = this.transaction
 
     const oAuth2Client = new OAuth2Client(
       GOOGLE_OAUTH_KEY,
@@ -54,7 +53,7 @@ class LoginWithGoogle extends BusinessAction {
       }
     } = result
 
-    const user = await findOrCreateUser({ email, name, avatarUrl })
+    const user = await findOrCreateUser({ email: email.toLowerCase(), name, avatarUrl })
     const token = AuthService.generateToken(user)
 
     return { token, user }

@@ -2,8 +2,6 @@ import BussinessAction from '../BusinessAction'
 import { TelemarketingSheet } from '../models'
 
 class FindOrCreateTelemarketingSheet extends BussinessAction {
-  runPerformWithinTransaction = true
-
   validationConstraints = {
     countryCode: {
       presence: true,

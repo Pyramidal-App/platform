@@ -4,7 +4,7 @@ import {
   BusinesActionForbiddenError
 } from './BusinessAction'
 
-const resolveWithBA = (BA, { passingInput } = {}) => async (
+const resolveWithBA = (BA, { passingInput = true } = {}) => async (
   _root,
   args,
   { currentUser }

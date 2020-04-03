@@ -27,7 +27,8 @@ class BusinesActionForbiddenError {
 class BusinessAction {
   // These are options that sub-classes can use
   validationConstraints = {}
-  runPerformWithinTransaction = false
+  runWithinTransaction = true
+  transactionLevel = undefined
 
   constructor (params, performer) {
     this.params = params || {}
@@ -62,27 +63,32 @@ class BusinessAction {
   }
 
   async aroundPerform (executePerform) {
-    if (!this.runPerformWithinTransaction) return await executePerform()
-
-    let result
-
-    this.transaction = await sequelize.transaction()
-
-    try {
-      result = await executePerform()
-    } catch (error) {
-      this.transaction.rollback()
-      throw error
+    if (!this.runWithinTransaction) {
+      return await executePerform()
     }
 
-    this.transaction.commit()
+    const options = this.transactionIsolationLevel && { isolationLevel: this.transactionIsolationLevel }
+    this.transaction = await sequelize.transaction(options)
 
-    return result
+    try {
+      const result = await executePerform()
+      await this.transaction.commit()
+      return result
+    } catch (error) {
+      await this.transaction.rollback()
+      this.transaction
+      throw error
+    }
   }
 
   async validate () {
     try {
-      await validate.async(this.params, this.validationConstraints)
+      const constraints =
+        typeof this.validationConstraints === 'function' ?
+        this.validationConstraints(this) :
+        this.validationConstraints
+
+      await validate.async(this.params, constraints)
     } catch (errors) {
       // The returned errors should be a plain object.
       // Otherwise it must be an error that was thrown while performing the validations

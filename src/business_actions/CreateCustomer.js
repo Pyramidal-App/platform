@@ -13,11 +13,9 @@ const allOrNone = (params, attributes) => {
 
 // Creates a customer belonging to performer
 class CreateCustomer extends BusinessAction {
-  runPerformWithinTransaction = true
-
   get validationConstraints () {
     return {
-      name: { presence: true },
+      name: { presence: { allowEmpty: false } },
 
       ...allOrNone(this.params, [
         'phoneNumberCountryCode',
@@ -47,21 +45,25 @@ class CreateCustomer extends BusinessAction {
       addressLng
     } = this.params
 
-    const customer = await Customer.create({ UserId: this.performer.id, name })
+    const transaction = this.transaction
+
+    const customer = await Customer.create({ UserId: this.performer.id, name }, { transaction })
 
     const [dbPhoneNumber] = await PhoneNumber.findOrCreate({
       where: {
         countryCode: phoneNumberCountryCode,
         areaCode: phoneNumberAreaCode,
         number: phoneNumber
-      }
+      },
+      transaction
     })
 
     await CustomersPhoneNumber.findOrCreate({
       where: {
         CustomerId: customer.id,
         PhoneNumberId: dbPhoneNumber.id
-      }
+      },
+      transaction
     })
 
     const address = await Address.create({
@@ -71,7 +73,7 @@ class CreateCustomer extends BusinessAction {
       notes: addressNotes,
       lat: addressLat,
       lng: addressLng
-    })
+    }, { transaction })
 
     return {
       ...customer.dataValues,

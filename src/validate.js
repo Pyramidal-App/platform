@@ -14,26 +14,27 @@ const matchesExistingRecord = (
   defaultMessage,
   testThatExists = false
 ) => async (value, options) => {
+  console.log('pete')
   if (!value) return
 
   const model = options.inModel
   const message = options.message || defaultMessage
 
-  let record
+  let recordCount
 
-  if (options.byAttribute) {
+  if (options.getRecordCount) {
+    recordCount = await options.getRecordCount(value)
+  } else if (options.byAttribute) {
     const whereClauses = { [options.byAttribute]: value }
-    record = await model.findOne({ where: whereClauses })
-  } else if (options.scope) {
-    record = await model.findOne({ where: options.scope })
+    recordCount = await model.count({ where: whereClauses })
   } else {
-    record = await model.findByPk(value)
+    throw new Error('Please specify either options.getRecordCount or options.byAttribute is missing')
   }
 
-  if (testThatExists && !record) {
+  if (testThatExists && recordCount <= 0) {
     return message
   }
-  if (!testThatExists && record) {
+  if (!testThatExists && recordCount > 0) {
     return message
   }
 }
@@ -45,5 +46,7 @@ validate.validators.matchesExistingRecord = matchesExistingRecord(
 )
 
 validate.validators.unique = matchesExistingRecord('is taken')
+
+validate.validators.presence.message = '^Este campo puede estar en blanco'
 
 export default validate

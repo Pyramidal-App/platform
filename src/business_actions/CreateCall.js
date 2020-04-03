@@ -9,8 +9,6 @@ const OUTCOMES = [
 ]
 
 class CreateCall extends BusinessAction {
-  runPerformWithinTransaction = true
-
   validationConstraints = {
     phoneNumberId: { presence: true },
     customerId: { presence: true },
@@ -20,6 +18,7 @@ class CreateCall extends BusinessAction {
 
   async executePerform() {
     const { phoneNumberId, customerId, outcome, notes, dateTime } = this.params
+    const transaction = this.transaction
 
     const call = await Call.create({
       outcome,
@@ -27,11 +26,11 @@ class CreateCall extends BusinessAction {
       PhoneNumberId: phoneNumberId,
       CustomerId: customerId,
       UserId: this.performer.id,
-    })
+    }, { transaction })
 
     if (outcome === 'DONT_CALL') {
-      const phoneNumber = await PhoneNumber.findByPk(phoneNumberId)
-      phoneNumber && await phoneNumber.update({ dontCall: true })
+      const phoneNumber = await PhoneNumber.findByPk(phoneNumberId, { transaction })
+      phoneNumber && await phoneNumber.update({ dontCall: true }, { transaction })
     }
 
     // Associate with as many entities as possible,
@@ -42,7 +41,7 @@ class CreateCall extends BusinessAction {
       CallId: call.id,
       PhoneNumberId: phoneNumberId,
       body: notes
-    })
+    }, { transaction })
 
     return call
   }

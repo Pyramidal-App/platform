@@ -7,11 +7,15 @@ import Address from './Address'
 import Call from './Call'
 import Note from './Note'
 import Task from './Task'
+import Team from './Team'
+import TeamMembership from './TeamMembership'
 
 User.hasMany(TelemarketingSheet)
 User.hasMany(Customer)
 User.hasMany(Call)
 User.hasMany(Task)
+User.hasMany(TeamMembership)
+User.belongsToMany(Team, { through: TeamMembership })
 
 TelemarketingSheet.belongsTo(User)
 
@@ -46,6 +50,12 @@ Task.belongsTo(User)
 Task.belongsTo(Customer)
 Task.belongsTo(Call, { as: 'triggererCall', foreignKey: 'TriggererCallId' })
 
+Team.hasMany(TeamMembership, { as: 'memberships' })
+Team.belongsToMany(User, { through: TeamMembership })
+
+TeamMembership.belongsTo(Team)
+TeamMembership.belongsTo(User)
+
 export {
   User,
   TelemarketingSheet,
@@ -55,5 +65,7 @@ export {
   Address,
   Call,
   Note,
-  Task
+  Task,
+  Team,
+  TeamMembership
 }
