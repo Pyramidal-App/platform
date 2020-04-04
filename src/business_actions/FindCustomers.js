@@ -1,7 +1,7 @@
 import BusinessAction from '../BusinessAction'
 import { Customer, PhoneNumber, Address } from '../models'
 
-class FindCustomer extends BusinessAction {
+class FindCustomers extends BusinessAction {
   validationConstraints = {
     countryCode: { presence: true },
     areaCode: { presence: true },
@@ -11,7 +11,12 @@ class FindCustomer extends BusinessAction {
   async executePerform () {
     const { countryCode, areaCode, number } = this.params
 
-    const customer = await Customer.findOne({
+    const [team] = await this.performer.getTeams()
+    const teamMembers = await team.getMembers()
+    const teamMemberIds = teamMembers.map(tm => tm.id)
+
+    const customers = await Customer.findAll({
+      where:  { UserId: [this.performer.id, ...teamMemberIds] },
       include: [
         {
           model: PhoneNumber,
@@ -22,14 +27,8 @@ class FindCustomer extends BusinessAction {
       ]
     })
 
-    // TODO: implement a proper field resolver
-    return customer && {
-      ...customer.dataValues,
-      id: customer.id,
-      addresses: customer.Addresses,
-      phoneNumbers: customer.PhoneNumbers
-    }
+    return customers
   }
 }
 
-export default FindCustomer
+export default FindCustomers

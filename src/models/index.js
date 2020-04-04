@@ -51,7 +51,7 @@ Task.belongsTo(Customer)
 Task.belongsTo(Call, { as: 'triggererCall', foreignKey: 'TriggererCallId' })
 
 Team.hasMany(TeamMembership, { as: 'memberships' })
-Team.belongsToMany(User, { through: TeamMembership })
+Team.belongsToMany(User, { through: TeamMembership, as: 'members' })
 
 TeamMembership.belongsTo(Team)
 TeamMembership.belongsTo(User)

@@ -7,10 +7,22 @@ class UpdateCustomer extends BusinessAction {
     name: { presence: true }
   }
 
+  async isAllowed() {
+    const customer = this.customer()
+    return customer.UserId = this.performer.id
+  }
+
   async executePerform() {
-    const { id, name } = this.params
-    const customer = await Customer.findByPk(id)
+    const { name } = this.params
+    const customer = await this._customer()
     return await customer.update({ name })
+  }
+
+  async _customer() {
+    if (!this.__customer) {
+      this.__customer = await Customer.findByPk(this.params.id)
+    }
+    return this.__customer
   }
 }
 
