@@ -18,6 +18,7 @@ import UpdateCustomer from './business_actions/UpdateCustomer'
 import UpdateAddress from './business_actions/UpdateAddress'
 import CreateCall from './business_actions/CreateCall'
 import CreateTask from './business_actions/CreateTask'
+import UpdateTask from  './business_actions/UpdateTask'
 import CreateTeam from './business_actions/CreateTeam'
 import InviteToTeam from './business_actions/InviteToTeam'
 import UpdateCurrentUser from './business_actions/UpdateCurrentUser'
@@ -50,6 +51,7 @@ const Server = new ApolloServer({
       updateAddress: resolveWithBA(UpdateAddress),
       createCall: resolveWithBA(CreateCall),
       createTask: resolveWithBA(CreateTask),
+      updateTask: resolveWithBA(UpdateTask),
       createTeam: resolveWithBA(CreateTeam),
       inviteToTeam: resolveWithBA(InviteToTeam),
       updateCurrentUser: resolveWithBA(UpdateCurrentUser)

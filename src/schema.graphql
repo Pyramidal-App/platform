@@ -196,6 +196,11 @@ input UpdateCurrentUserInput {
   name: String!
 }
 
+input UpdateTaskInput {
+  id: ID!
+  status: TaskStatus
+}
+
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
   findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
@@ -207,6 +212,7 @@ type Mutation {
   createTeam(input: CreateTeamInput!): Team!
   inviteToTeam(input: InviteToTeamInput!): TeamMembership!
   updateCurrentUser(input: UpdateCurrentUserInput!): User!
+  updateTask(input: UpdateTaskInput!): Task!
 }
 
 type Query {
@@ -215,4 +221,3 @@ type Query {
   customers(input: PhoneNumberIdentifiers!): [Customer]!
   currentUser: User
 }
-
