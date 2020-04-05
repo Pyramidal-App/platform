@@ -1,6 +1,7 @@
 import { ApolloLogExtension } from 'apollo-log'
 import { ApolloServer, gql } from 'apollo-server'
 import { Op } from 'sequelize'
+import { sequelize } from './db'
 
 import { Customer, Call, User, Task, Team, TeamMembership } from './models'
 import typeDefs from './schema.graphql'
@@ -64,6 +65,7 @@ const Server = new ApolloServer({
     },
     Call: {
       user: async call => await User.findByPk(call.UserId),
+      customer: async call => await Customer.findByPk(call.CustomerId),
       notes: async call => await new Call({ id: call.id }).getNotes(),
       // TODO: introduce a global solution for datetime types.
       // We can use a custom Scalar.
@@ -71,6 +73,8 @@ const Server = new ApolloServer({
     },
     Task: {
       user: async task => await User.findByPk(task.UserId),
+      customer: async task => await Customer.findByPk(task.CustomerId),
+      triggererCall: async task => await Call.findByPk(task.TriggererCallId),
       // TODO: same as with Call.dateTime resolver
       dueDate: task => task.dueDate.toISOString()
     },
@@ -78,7 +82,12 @@ const Server = new ApolloServer({
       team: async user => {
         const teams = await new User({ id: user.id }).getTeams()
         return teams[0]
-      }
+      },
+      tasks: async user => await new User({ id: user.id }).getTasks({
+        order: [
+          [sequelize.fn('COALESCE', sequelize.col('dueDate'), sequelize.col('updatedAt')), 'DESC']
+        ]
+      })
     },
     Team: {
       memberships: async team => await new Team({ id: team.id }).getMemberships()

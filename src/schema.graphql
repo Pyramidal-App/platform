@@ -24,12 +24,13 @@ type User {
   avatarUrl: String
   customers: [Customer]!
   team: Team
+  tasks: [Task]!
 }
 
 type Customer {
   id: ID!
-  userId: ID!
   name: String!
+  userId: ID!
   user: User!
   phoneNumbers: [PhoneNumber]!
   addresses: [Address]!
