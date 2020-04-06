@@ -1,12 +1,13 @@
 import { ApolloLogExtension } from 'apollo-log'
-import { ApolloServer, gql } from 'apollo-server'
+import { ApolloServer, gql, withFilter } from 'apollo-server'
 import { Op } from 'sequelize'
-import { sequelize } from './db'
 
+import { sequelize } from './db'
 import { Customer, Call, User, Task, Team, TeamMembership } from './models'
 import typeDefs from './schema.graphql'
 import resolveWithBA from './resolveWithBA.js'
 import AuthService from './AuthService'
+import pubSub, { NOTIFICATION_ACTIVATED } from './pubSub'
 
 import LogInWithGoogle from './business_actions/LogInWithGoogle'
 import FindOrCreateTelemarketingSheet from './business_actions/FindOrCreateTelemarketingSheet'
@@ -27,12 +28,14 @@ import TelemarketingSheetResolver from './typeResolvers/TelemarketingSheetResolv
 
 const Server = new ApolloServer({
   extensions: [_ => new ApolloLogExtension()],
-  context: async ({ req }) => {
-    const token = req.headers.authorization
+  context: async ({ req, connection }) => {
+    const token = connection ? connection.context.authorization : req.headers.authorization
 
     if (token) {
       const currentUser = await AuthService.getUser(token)
       return { currentUser }
+    } else {
+      throw new Error('No authentication present')
     }
   },
   typeDefs,
@@ -43,6 +46,7 @@ const Server = new ApolloServer({
       customers: resolveWithBA(FindCustomers),
       currentUser: (_root, _args, { currentUser }) => currentUser
     },
+
     Mutation: {
       logInWithGoogle: resolveWithBA(LogInWithGoogle),
       findOrCreateTelemarketingSheet: resolveWithBA(FindOrCreateTelemarketingSheet),
@@ -56,7 +60,18 @@ const Server = new ApolloServer({
       inviteToTeam: resolveWithBA(InviteToTeam),
       updateCurrentUser: resolveWithBA(UpdateCurrentUser)
     },
+
+    Subscription: {
+      notificationActivated: {
+        subscribe: withFilter(
+          _ => pubSub.asyncIterator([NOTIFICATION_ACTIVATED]),
+          ({ notificationActivated: notification }, _vars, { currentUser }) => notification.UserId === currentUser.id
+        )
+      }
+    },
+
     TelemarketingSheet: TelemarketingSheetResolver,
+
     Customer: {
       phoneNumbers: async customer => await new Customer({ id: customer.id }).getPhoneNumbers(),
       addresses: async customer => await new Customer({ id: customer.id }).getAddresses(),
@@ -65,6 +80,7 @@ const Server = new ApolloServer({
       userId: customer => customer.UserId,
       user: async customer => await User.findByPk(customer.UserId),
     },
+
     Call: {
       user: async call => await User.findByPk(call.UserId),
       customer: async call => await Customer.findByPk(call.CustomerId),
@@ -73,13 +89,15 @@ const Server = new ApolloServer({
       // We can use a custom Scalar.
       dateTime: call => call.dateTime.toISOString()
     },
+
     Task: {
       user: async task => await User.findByPk(task.UserId),
       customer: async task => await Customer.findByPk(task.CustomerId),
       triggererCall: async task => await Call.findByPk(task.TriggererCallId),
       // TODO: same as with Call.dateTime resolver
-      dueDate: task => task.dueDate.toISOString()
+      dueDate: task => task.dueDate && new Date(task.dueDate).toISOString()
     },
+
     User: {
       team: async user => {
         const teams = await new User({ id: user.id }).getTeams()
@@ -91,11 +109,17 @@ const Server = new ApolloServer({
         ]
       })
     },
+
     Team: {
       memberships: async team => await new Team({ id: team.id }).getMemberships()
     },
+
     TeamMembership: {
       user: async membership => await User.findByPk(membership.UserId)
+    },
+
+    Notification: {
+      activateAt: n => n.activateAt && new Date(n.activateAt).toISOString()
     }
   }
 })

@@ -20,10 +20,7 @@ Task.init({
     type: Sequelize.INTEGER,
     allowNull: false
   },
-  TriggererCallId: {
-    type: Sequelize.INTEGER,
-    allowNull: false
-  },
+  TriggererCallId: Sequelize.INTEGER,
   status: {
     type: Sequelize.STRING,
     allowNull: false,

@@ -9,12 +9,14 @@ import Note from './Note'
 import Task from './Task'
 import Team from './Team'
 import TeamMembership from './TeamMembership'
+import Notification from './Notification'
 
 User.hasMany(TelemarketingSheet)
 User.hasMany(Customer)
 User.hasMany(Call)
 User.hasMany(Task)
 User.hasMany(TeamMembership)
+User.hasMany(Notification)
 User.belongsToMany(Team, { through: TeamMembership })
 
 TelemarketingSheet.belongsTo(User)
@@ -56,6 +58,8 @@ Team.belongsToMany(User, { through: TeamMembership, as: 'members' })
 TeamMembership.belongsTo(Team)
 TeamMembership.belongsTo(User)
 
+Notification.belongsTo(User)
+
 export {
   User,
   TelemarketingSheet,
@@ -67,5 +71,6 @@ export {
   Note,
   Task,
   Team,
-  TeamMembership
+  TeamMembership,
+  Notification
 }

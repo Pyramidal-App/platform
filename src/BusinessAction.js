@@ -6,17 +6,25 @@ import { sequelize } from './db'
 const isPlainObject = obj =>
   Object.prototype.toString.call(obj) === '[object Object]'
 
-class BusinesActionValidationError {
+class BusinesActionValidationError extends Error {
   constructor (ba, errors) {
-    this.name = 'BusinesActionValidationError'
+    super('Business action validation error')
     this.businessAction = ba
     this.errors = ba.errors
   }
 }
 
-class BusinesActionForbiddenError {
-  constructor (ba, errors) {
-    this.name = 'BusinesActionForbiddenError'
+class BusinesActionForbiddenError extends Error {
+  constructor (ba) {
+    super('Business action is forbidden for this performer')
+    this.businessAction = ba
+  }
+}
+
+class BusinessActionDefinitionError extends Error {
+  constructor (ba, message) {
+    super(message)
+    this.name = 'BusinessActionDefinitionError'
     this.businessAction = ba
   }
 }
@@ -29,16 +37,24 @@ class BusinessAction {
   validationConstraints = {}
   runWithinTransaction = true
   transactionLevel = undefined
+  manageTransaction = true
 
-  constructor (params, performer) {
+  constructor (params, performer, { transaction } = {}) {
     this.params = params || {}
     this.performer = performer
 
     this.errors = {}
     this.valid = true
+
+    // If transaction is passed, we must let the caller manage it
+    if (transaction) {
+      this.transaction = transaction
+      this.manageTransaction = false
+    }
   }
 
   async perform () {
+
     const valid = await this.validate()
     if (!valid) throw new BusinesActionValidationError(this)
 
@@ -55,7 +71,8 @@ class BusinessAction {
 
   // You can overwrite these
   executePerform () {
-    throw 'You must define this'
+    const message = `You must define method "executePerform" from business action "${this.constructor.name}"`
+    throw new BusinessActionDefinitionError(this, message)
   }
 
   async isAllowed () {
@@ -68,15 +85,15 @@ class BusinessAction {
     }
 
     const options = this.transactionIsolationLevel && { isolationLevel: this.transactionIsolationLevel }
-    this.transaction = await sequelize.transaction(options)
+
+    this.transaction = this.transaction || await sequelize.transaction(options)
 
     try {
       const result = await executePerform()
-      await this.transaction.commit()
+      this.manageTransaction && await this.transaction.commit()
       return result
     } catch (error) {
-      await this.transaction.rollback()
-      this.transaction
+      this.manageTransaction && await this.transaction.rollback()
       throw error
     }
   }

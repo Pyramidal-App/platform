@@ -115,6 +115,15 @@ type TeamMembership {
   admin: Boolean
 }
 
+type Notification {
+  id: ID!
+  activateAt: String
+  userId: ID!
+  user: User!
+  read: Boolean!
+  payload: Task!
+}
+
 type UserAndToken {
   token: String!
   user: User!
@@ -177,7 +186,7 @@ input CreateCallInput {
 
 input CreateTaskInput {
   customerId: ID!
-  triggererCallId: ID!
+  triggererCallId: ID
   taskType: TaskType!
   dueDate: String
 }
@@ -220,4 +229,8 @@ type Query {
   telemarketingSheets: [TelemarketingSheet]
   customers(input: PhoneNumberIdentifiers!): [Customer]!
   currentUser: User
+}
+
+type Subscription {
+  notificationActivated: Notification!
 }

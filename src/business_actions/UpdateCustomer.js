@@ -8,7 +8,7 @@ class UpdateCustomer extends BusinessAction {
   }
 
   async isAllowed() {
-    const customer = this.customer()
+    const customer = this._customer()
     return customer.UserId = this.performer.id
   }
 
