@@ -21,6 +21,7 @@ import UpdateAddress from './business_actions/UpdateAddress'
 import CreateCall from './business_actions/CreateCall'
 import CreateTask from './business_actions/CreateTask'
 import UpdateTask from  './business_actions/UpdateTask'
+import CancelTask from './business_actions/CancelTask'
 import CreateTeam from './business_actions/CreateTeam'
 import InviteToTeam from './business_actions/InviteToTeam'
 import UpdateCurrentUser from './business_actions/UpdateCurrentUser'
@@ -34,10 +35,12 @@ const Server = new ApolloServer({
     const token = connection ? connection.context.authorization : req.headers.authorization
 
     if (token) {
-      const currentUser = await AuthService.getUser(token)
-      return { currentUser }
-    } else {
-      throw new Error('No authentication present')
+      try {
+        const currentUser = await AuthService.getUser(token)
+        return { currentUser }
+      } catch (error) {
+        console.error(error)
+      }
     }
   },
   typeDefs,
@@ -60,6 +63,7 @@ const Server = new ApolloServer({
       updateAddress: resolveWithBA(UpdateAddress),
       createCall: resolveWithBA(CreateCall),
       createTask: resolveWithBA(CreateTask),
+      cancelTask: resolveWithBA(CancelTask, { passingInput: false }),
       updateTask: resolveWithBA(UpdateTask),
       createTeam: resolveWithBA(CreateTeam),
       inviteToTeam: resolveWithBA(InviteToTeam),

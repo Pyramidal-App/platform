@@ -222,10 +222,11 @@ type Mutation {
   updateAddress(input: UpdateAddressInput!): Address!
   createCall(input: CreateCallInput!): Call!
   createTask(input: CreateTaskInput!): Task!
+  updateTask(input: UpdateTaskInput!): Task!
+  cancelTask(taskId: ID!): Task!
   createTeam(input: CreateTeamInput!): Team!
   inviteToTeam(input: InviteToTeamInput!): TeamMembership!
   updateCurrentUser(input: UpdateCurrentUserInput!): User!
-  updateTask(input: UpdateTaskInput!): Task!
   markNotificationsRead(notificationIds: [ID!]): [Notification]!
 }
 

@@ -49,4 +49,7 @@ validate.validators.unique = matchesExistingRecord('is taken')
 
 validate.validators.presence.message = '^Este campo puede estar en blanco'
 
+/*
+* Validator
+*/
 export default validate

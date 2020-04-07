@@ -1,6 +1,6 @@
 import BusinessAction from '../BusinessAction'
 import { Notification } from '../models'
-import agenda from '../Agenda'
+import Agenda, { PUBLISH_NOTIFICATION_ACTIVATED } from '../Agenda'
 
 class CreateNotification extends BusinessAction {
   async executePerform () {
@@ -14,7 +14,7 @@ class CreateNotification extends BusinessAction {
     }, { transaction: this.transaction })
 
     const job = [
-      'publish notification activated',
+      PUBLISH_NOTIFICATION_ACTIVATED,
       { notificationId: notification.id }
     ]
 
@@ -22,9 +22,9 @@ class CreateNotification extends BusinessAction {
       notification.activateAt &&
       notification.activateAt > new Date()
     ) {
-      agenda.schedule(notification.activateAt, ...job)
+      Agenda.schedule(notification.activateAt, ...job)
     } else {
-      agenda.now(...job)
+      Agenda.now(...job)
     }
 
     return notification

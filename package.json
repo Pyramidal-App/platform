@@ -7,7 +7,8 @@
     "start": "nodemon -w src -e js,graphql -x babel-node src/index.js",
     "console": "babel-node",
     "seq": "sequelize-cli",
-    "agrendash": "agendash --db $AGENDA_MONGO_DB_URL"
+    "agrendash": "agendash --db $AGENDA_MONGO_DB_URL",
+    "jsdoc": "nodemon -w src -e js,graphql -x 'jsdoc -d ./doc/ src -t ./node_modules/minami'"
   },
   "dependencies": {
     "agenda": "^3.0.0",
@@ -36,6 +37,8 @@
     "@babel/preset-env": "^7.8.6",
     "agendash": "^1.0.0",
     "babel-plugin-import-graphql": "^2.7.0",
+    "jsdoc": "^3.6.4",
+    "minami": "^1.2.3",
     "nodemon": "^2.0.2"
   }
 }

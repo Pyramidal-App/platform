@@ -20,7 +20,7 @@ module.exports = {
         references: { model: 'Users', key: 'id' }
       },
       payload: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: false
       },
       createdAt: {
