@@ -1,3 +1,5 @@
+scalar DateTime
+
 enum CallOutcome {
   DIDNT_ANSWER
   NOT_INTERESTED
@@ -25,6 +27,7 @@ type User {
   customers: [Customer]!
   team: Team
   tasks: [Task]!
+  notifications(read: Boolean, limit: Int): [Notification]!
 }
 
 type Customer {
@@ -79,7 +82,7 @@ type Call {
   user: User!
   notes: [Note]!
   outcome: CallOutcome!
-  dateTime: String!
+  dateTime: DateTime!
 }
 
 type Note {
@@ -117,7 +120,8 @@ type TeamMembership {
 
 type Notification {
   id: ID!
-  activateAt: String
+  activateAt: DateTime
+  createdAt: DateTime!
   userId: ID!
   user: User!
   read: Boolean!
@@ -180,7 +184,7 @@ input CreateCallInput {
   phoneNumberId: ID!
   customerId: ID!
   outcome: CallOutcome!
-  dateTime: String!
+  dateTime: DateTime!
   notes: String
 }
 
@@ -188,7 +192,7 @@ input CreateTaskInput {
   customerId: ID!
   triggererCallId: ID
   taskType: TaskType!
-  dueDate: String
+  dueDate: DateTime
 }
 
 input CreateTeamInput {

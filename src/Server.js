@@ -1,9 +1,10 @@
 import { ApolloLogExtension } from 'apollo-log'
 import { ApolloServer, gql, withFilter } from 'apollo-server'
 import { Op } from 'sequelize'
+import { GraphQLDateTime } from 'graphql-iso-date'
 
 import { sequelize } from './db'
-import { Customer, Call, User, Task, Team, TeamMembership } from './models'
+import { Customer, Call, User, Task, Team, TeamMembership, Notification } from './models'
 import typeDefs from './schema.graphql'
 import resolveWithBA from './resolveWithBA.js'
 import AuthService from './AuthService'
@@ -40,6 +41,9 @@ const Server = new ApolloServer({
   },
   typeDefs,
   resolvers: {
+    // Custom scalar
+    DateTime: GraphQLDateTime,
+
     Query: {
       telemarketingSheet: resolveWithBA(FindTelemarketingSheet),
       telemarketingSheets: resolveWithBA(ListTelemarketingSheets, { passingInput: false }),
@@ -85,17 +89,12 @@ const Server = new ApolloServer({
       user: async call => await User.findByPk(call.UserId),
       customer: async call => await Customer.findByPk(call.CustomerId),
       notes: async call => await new Call({ id: call.id }).getNotes(),
-      // TODO: introduce a global solution for datetime types.
-      // We can use a custom Scalar.
-      dateTime: call => call.dateTime.toISOString()
     },
 
     Task: {
       user: async task => await User.findByPk(task.UserId),
       customer: async task => await Customer.findByPk(task.CustomerId),
       triggererCall: async task => await Call.findByPk(task.TriggererCallId),
-      // TODO: same as with Call.dateTime resolver
-      dueDate: task => task.dueDate && new Date(task.dueDate).toISOString()
     },
 
     User: {
@@ -107,7 +106,16 @@ const Server = new ApolloServer({
         order: [
           [sequelize.fn('COALESCE', sequelize.col('dueDate'), sequelize.col('updatedAt')), 'DESC']
         ]
-      })
+      }),
+      notifications: async (user, vars) => {
+        const filters = vars.hasOwnProperty('read') ? { read: vars.read } : {}
+        const limit = vars.limit || 5
+        const notifications = await Notification.findAll({
+          limit,
+          where: { ...filters, UserId: user.id }
+        })
+        return notifications
+      }
     },
 
     Team: {
@@ -116,10 +124,6 @@ const Server = new ApolloServer({
 
     TeamMembership: {
       user: async membership => await User.findByPk(membership.UserId)
-    },
-
-    Notification: {
-      activateAt: n => n.activateAt && new Date(n.activateAt).toISOString()
     }
   }
 })
