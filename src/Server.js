@@ -24,6 +24,7 @@ import UpdateTask from  './business_actions/UpdateTask'
 import CreateTeam from './business_actions/CreateTeam'
 import InviteToTeam from './business_actions/InviteToTeam'
 import UpdateCurrentUser from './business_actions/UpdateCurrentUser'
+import MarkNotificationsRead from './business_actions/MarkNotificationsRead'
 
 import TelemarketingSheetResolver from './typeResolvers/TelemarketingSheetResolver'
 
@@ -62,7 +63,8 @@ const Server = new ApolloServer({
       updateTask: resolveWithBA(UpdateTask),
       createTeam: resolveWithBA(CreateTeam),
       inviteToTeam: resolveWithBA(InviteToTeam),
-      updateCurrentUser: resolveWithBA(UpdateCurrentUser)
+      updateCurrentUser: resolveWithBA(UpdateCurrentUser),
+      markNotificationsRead: resolveWithBA(MarkNotificationsRead, { passingInput: false })
     },
 
     Subscription: {
@@ -124,7 +126,7 @@ const Server = new ApolloServer({
 
     TeamMembership: {
       user: async membership => await User.findByPk(membership.UserId)
-    }
+    },
   }
 })
 

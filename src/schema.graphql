@@ -100,7 +100,7 @@ type Task {
   user: User!
   triggererCall: Call!
   taskType: TaskType!
-  dueDate: String!
+  dueDate: DateTime!
   status: TaskStatus!
 }
 
@@ -226,6 +226,7 @@ type Mutation {
   inviteToTeam(input: InviteToTeamInput!): TeamMembership!
   updateCurrentUser(input: UpdateCurrentUserInput!): User!
   updateTask(input: UpdateTaskInput!): Task!
+  markNotificationsRead(notificationIds: [ID!]): [Notification]!
 }
 
 type Query {

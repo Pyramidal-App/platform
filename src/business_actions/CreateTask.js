@@ -11,7 +11,7 @@ const TASK_TYPES = ['CALL', 'VISIT']
 
 class CreateTask extends BusinessAction {
   validationConstraints = {
-    customerId: { presence: true },
+    customerId: { presence: { allowEmpty: false } },
     taskType: { presence: true, inclusion: TASK_TYPES }
   }
 
@@ -29,17 +29,20 @@ class CreateTask extends BusinessAction {
     }, { transaction })
 
     if (task.dueDate) {
-      Promise.all([
+      await Promise.all([
         addMinutes(task.dueDate, -30),
-        addDays(task.dueDate, -1)
-      ].map(async activateAt =>
+        addDays(task.dueDate, -1),
+        task.dueDate
+      ].map(async activateAt => {
+        if (activateAt < new Date()) { return }
+
         await new CreateNotification({
           activateAt,
           userId: this.performer.id,
           read: false,
           payload: task
         }, { transaction }).perform()
-      ))
+      }))
     }
 
     return task
