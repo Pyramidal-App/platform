@@ -29,8 +29,10 @@ import Agenda from './Agenda'
 const PORT = process.env.port || 4000
 
 const start = async _ => {
-  await Agenda.start()
-  console.log('✔ Agenda started');
+  if (process.env.RUN_BACKGROUND_JOBS) {
+    await Agenda.start()
+    console.log('✔ Agenda started');
+  }
 
   const { url, subscriptionsUrl } = await Server.listen(PORT)
   console.log(`🚀 Server ready at ${url}`)
