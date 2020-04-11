@@ -14,12 +14,9 @@ import opFilter from '$src/Search/search_filters/opFilter'
 class SearchTasks extends Search {
   model = Task
 
-  isAllowed () {
-    const userId = this.params.filters.assignedToUser
-    return userId && userId === this.performer.id
-  }
+  static orderableBy = ['dueDate', 'createdAt']
 
-  filters = {
+  static filters = {
     assignedToUser: opFilter('UserId'),
     customerId: opFilter('CustomerId'),
     status: opFilter('status'),
@@ -28,6 +25,11 @@ class SearchTasks extends Search {
     maxCreatedAt: opFilter('createdAt', Op.lte),
     minDueDate: opFilter('dueDate', Op.gte),
     maxDueDate: opFilter('dueDate', Op.lte),
+  }
+
+  isAllowed () {
+    const userId = this.params.filters.assignedToUser
+    return userId && userId === this.performer.id
   }
 }
 

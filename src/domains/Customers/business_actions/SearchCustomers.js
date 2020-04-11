@@ -16,7 +16,7 @@ class SearchCustomers extends Search {
     return userId && userId === this.performer.id
   }
 
-  filters = {
+  static filters = {
     visibleToUser,
 
     phoneNumber(queryOptions, value) {

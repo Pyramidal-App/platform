@@ -1,3 +1,4 @@
+import update from 'lodash.update'
 import toPairs from 'lodash.topairs'
 import BusinessAction from '$src/BusinessAction'
 
@@ -12,6 +13,7 @@ class UndefinedSearchFilterError extends Error {
 
 /**
  * @abstract
+ * @extends {BusinessAction}
  * Helps define a query builder object.
  */
 class Search extends BusinessAction {
@@ -22,20 +24,56 @@ class Search extends BusinessAction {
   model = undefined
 
   /**
+   * Override with an object.
+   * Used to define filter resolvers.
+   * Keys are filter name that point to reducer functions.
+   * The accumulated value is passed to `model.findlAll()`
+   * @abstract
+   */
+  static filters = undefined
+
+  /**
+   * Records returned per page. Only used as fallback when params.recordsPerPage
+   * was not provided. Data is only paginated if params.page is present.
+   * @abstract
+   * @type {int}
+   */
+  static recordsPerPage = 10
+
+  /**
    * An object where keys are filter names, and values are
    * functions that implement these filters.
    * @abstract
    */
   filters = {}
 
+  /**
+   * @constructor
+   * @param limit Number of records to retrieve
+   * @param orderBy  of records to retrieve
+   * @param filters of records to retrieve
+   */
+  constructor({ limit, orderBy = [], filters = {}, page, recordsPerPage }, ...args) {
+    super({ limit, orderBy, filters, page, recordsPerPage }, ...args)
+  }
+
   /*
    * @abstract
    * @private
    */
   async executePerform () {
-    const queryOptions = await this._getQueryOptions()
-    const results = await this.model.findAll(queryOptions)
-    return results
+    const queryOptions = await this._queryOptions()
+
+    const { rows, count } =
+      await this.model.findAndCountAll(queryOptions)
+
+    return {
+      page: this._page(),
+      totalPages: Math.ceil(count / this._recordsPerPage()),
+      recordsPerPage: this._recordsPerPage(),
+      total: count,
+      data: rows,
+    }
   }
 
   /*
@@ -43,20 +81,38 @@ class Search extends BusinessAction {
    * @private
    * @raises {UndefinedSearchFilterError}
    */
-  async _getQueryOptions () {
+  async _queryOptions() {
     let accumulator = {
       where: {},
       include: [],
-      transaction: this.transaction
+      order: [],
+      transaction: this.transaction,
+      limit: this._recordsPerPage(),
+      offset: this._page() && this._page() - 1
     }
 
     for (const [filterName, filterValue] of toPairs(this.params.filters)) {
-      const fn = this.filters[filterName]
+      const fn = this.constructor.filters[filterName]
       if (!fn) { throw new UndefinedSearchFilterError(filterName) }
       accumulator = await fn(accumulator, filterValue, this.params)
     }
 
+    for (const { identifier, direction } of this.params.orderBy) {
+      if (this.constructor.orderableBy.includes(identifier)) {
+        accumulator = update(accumulator, 'order', order => [...order, [identifier, direction]] )
+      }
+    }
+
     return accumulator
+  }
+
+  _recordsPerPage() {
+    if (this._page() === undefined) { return }
+    return this.params.recordsPerPage || this.recordsPerPage || this.constructor.recordsPerPage
+  }
+
+  _page() {
+    return this.params.page
   }
 }
 

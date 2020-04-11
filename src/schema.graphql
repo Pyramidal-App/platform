@@ -19,18 +19,32 @@ enum TaskStatus {
   CANCELLED
 }
 
+interface Record {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+interface RecordPage {
+  page: Int
+  totalPages: Int
+  recordsPerPage: Int
+  total: Int
+  data: [Record]!
+}
+
 type User {
   id: ID!
   name: String
   email: String!
   avatarUrl: String
-  customers(input: CustomerSearchInput): [Customer]!
+  customers(input: CustomerSearchInput): CustomerPage!
   team: Team
-  tasks(input: TaskSearchInput): [Task]!
+  tasks(input: TaskSearchInput): TaskPage!
   notifications(read: Boolean, limit: Int): [Notification]!
 }
 
-type Customer {
+type Customer implements Record {
   id: ID!
   name: String!
   userId: ID!
@@ -39,6 +53,16 @@ type Customer {
   addresses: [Address]!
   calls: [Call]!
   tasks: [Task]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TaskPage implements RecordPage {
+  page: Int
+  totalPages: Int
+  total: Int
+  recordsPerPage: Int
+  data: [Task]!
 }
 
 type PhoneNumber {
@@ -94,7 +118,7 @@ type Note {
   body: String!
 }
 
-type Task {
+type Task implements Record {
   id: ID!
   customer: Customer!
   user: User!
@@ -102,6 +126,16 @@ type Task {
   taskType: TaskType!
   dueDate: DateTime!
   status: TaskStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type CustomerPage implements RecordPage {
+  page: Int
+  totalPages: Int
+  total: Int
+  recordsPerPage: Int
+  data: [Customer]!
 }
 
 type Team {
@@ -160,8 +194,22 @@ input CustomerSearchFilters {
 
 input CustomerSearchInput {
   limit: Int
-  order: [String]
   filters: CustomerSearchFilters
+}
+
+enum SearchOrderDirection {
+  asc
+  desc
+}
+
+enum TaskSearchOrderIdentifier {
+  dueDate
+  createdAt
+}
+
+input TaskSearchOrder {
+  identifier: TaskSearchOrderIdentifier!
+  direction: SearchOrderDirection
 }
 
 input TaskSearchFilters {
@@ -176,8 +224,10 @@ input TaskSearchFilters {
 }
 
 input TaskSearchInput {
+  page: Int
+  recordsPerPage: Int
   limit: Int
-  order: [String]
+  orderBy: [TaskSearchOrder]
   filters: TaskSearchFilters
 }
 

@@ -47,7 +47,7 @@ class CreateTask extends BusinessAction {
       ].map(async activateAt => {
         if (activateAt < new Date()) { return }
 
-        await new Notifications.craete({
+        await new Notifications.create({
           activateAt,
           userId: this.performer.id,
           read: false,
