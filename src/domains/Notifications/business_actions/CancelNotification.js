@@ -1,6 +1,6 @@
-import BusinessAction from '../BusinessAction'
-import Agenda, { PUBLISH_NOTIFICATION_ACTIVATED } from '../Agenda'
-import { Notification } from '../models'
+import BusinessAction from '$src/BusinessAction'
+import Agenda, { PUBLISH_NOTIFICATION_ACTIVATED } from '$src/Agenda'
+import { Notification } from '$src/models'
 
 class CancelNotification extends BusinessAction {
   validationConstraints =  {

@@ -1,5 +1,9 @@
 import validate from 'validate.js'
 
+/**
+ * The validator function provided via options.with
+ * must return a message if validation failed, or nothing.
+ */
 validate.validators.custom = async (value, options) => {
   return await options.with(value)
 }

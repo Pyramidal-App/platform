@@ -1,5 +1,5 @@
-import BusinessAction from '../BusinessAction'
-import { Customer, CustomersPhoneNumber, PhoneNumber, Address } from '../models'
+import BusinessAction from '$src/BusinessAction'
+import { Customer, CustomersPhoneNumber, PhoneNumber, Address } from '$src/models'
 
 // If any of these attributes is pressent, all of them must be
 const allOrNone = (params, attributes) => {

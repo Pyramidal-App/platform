@@ -1,4 +1,23 @@
 {
   "presets": [["@babel/preset-env", {"targets": {"node": "current"}}]],
-  "plugins": ["@babel/plugin-proposal-class-properties", "import-graphql"]
+  "plugins": [
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-export-default-from",
+    "import-graphql",
+    ["@babel/plugin-proposal-pipeline-operator", { "proposal": "smart" }],
+    ["module-resolver", {
+      "root": ["."],
+      "alias": {
+        "$root": ".",
+        "$src": "./src"
+      },
+      "transformFunctions": [
+        "require",
+        "require.resolve",
+        "System.import",
+        "readFileSync",
+        "reload",
+      ]
+    }]
+  ]
 }

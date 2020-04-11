@@ -24,9 +24,9 @@ type User {
   name: String
   email: String!
   avatarUrl: String
-  customers: [Customer]!
+  customers(input: CustomerSearchInput): [Customer]!
   team: Team
-  tasks: [Task]!
+  tasks(input: TaskSearchInput): [Task]!
   notifications(read: Boolean, limit: Int): [Notification]!
 }
 
@@ -154,6 +154,33 @@ input PhoneNumberIdentifiers {
   number: String!
 }
 
+input CustomerSearchFilters {
+  phoneNumber: PhoneNumberIdentifiers,
+}
+
+input CustomerSearchInput {
+  limit: Int
+  order: [String]
+  filters: CustomerSearchFilters
+}
+
+input TaskSearchFilters {
+  customerId: ID
+  userId: ID
+  taskType: TaskType
+  status: TaskStatus
+  minCreatedAt: DateTime
+  maxCreatedAt: DateTime
+  minDueDate: DateTime
+  maxDueDate: DateTime
+}
+
+input TaskSearchInput {
+  limit: Int
+  order: [String]
+  filters: TaskSearchFilters
+}
+
 input CreateCustomerInput {
   name: String!
   phoneNumberCountryCode: String!
@@ -209,11 +236,6 @@ input UpdateCurrentUserInput {
   name: String!
 }
 
-input UpdateTaskInput {
-  id: ID!
-  status: TaskStatus
-}
-
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
   findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
@@ -221,19 +243,19 @@ type Mutation {
   updateCustomer(input: UpdateCustomerInput!): Customer!
   updateAddress(input: UpdateAddressInput!): Address!
   createCall(input: CreateCallInput!): Call!
-  createTask(input: CreateTaskInput!): Task!
-  updateTask(input: UpdateTaskInput!): Task!
-  cancelTask(taskId: ID!): Task!
   createTeam(input: CreateTeamInput!): Team!
   inviteToTeam(input: InviteToTeamInput!): TeamMembership!
   updateCurrentUser(input: UpdateCurrentUserInput!): User!
   markNotificationsRead(notificationIds: [ID!]): [Notification]!
+
+  createTask(input: CreateTaskInput!): Task!
+  cancelTask(taskId: ID!): Task!
+  completeTask(taskId: ID!): Task!
 }
 
 type Query {
   telemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet
   telemarketingSheets: [TelemarketingSheet]
-  customers(input: PhoneNumberIdentifiers!): [Customer]!
   currentUser: User
 }
 

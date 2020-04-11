@@ -1,9 +1,12 @@
 import { UserInputError, ForbiddenError } from 'apollo-server'
 import {
-  BusinesActionValidationError,
-  BusinesActionForbiddenError
+  BusinessActionValidationError,
+  BusinessActionForbiddenError
 } from './BusinessAction'
 
+/**
+* A HOF that takes a business action and returns a GQL resolver function.
+*/
 const resolveWithBA = (BA, { passingInput = true } = {}) => async (
   _root,
   args,
@@ -20,14 +23,14 @@ const resolveWithBA = (BA, { passingInput = true } = {}) => async (
       return result
     }
   } catch (error) {
-    if (error instanceof BusinesActionValidationError) {
+    if (error instanceof BusinessActionValidationError) {
       throw new UserInputError('Validation Error', {
         originalError: error,
         errorsPerField: error.errors
       })
     }
 
-    if (error instanceof BusinesActionForbiddenError) {
+    if (error instanceof BusinessActionForbiddenError) {
       throw new ForbiddenError('Forbidden Error', { originalError: error })
     }
 

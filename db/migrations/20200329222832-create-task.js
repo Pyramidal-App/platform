@@ -9,7 +9,7 @@ const STATUS_ENUM = 'task_status'
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await createEnum(queryInterface, TYPE_ENUM, ['CALL', 'VISIT'])
-    await createEnum(queryInterface, STATUS_ENUM, ['PENDING', 'COMPLETED', 'CANCELLED', 'OVERDUE'])
+    await createEnum(queryInterface, STATUS_ENUM, ['PENDING', 'COMPLETED', 'CANCELLED'])
 
     await queryInterface.createTable('Tasks', {
       id: {

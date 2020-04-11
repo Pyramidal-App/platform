@@ -24,6 +24,8 @@ const findOrCreateUser = async ({ email, name, avatarUrl }) => {
 }
 
 class LoginWithGoogle extends BusinessAction {
+  static requirePerformer = false
+
   async executePerform () {
     const { accessToken, idToken } = this.params
     const transaction = this.transaction

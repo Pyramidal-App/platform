@@ -1,6 +1,6 @@
-import BusinessAction from '../BusinessAction'
-import { Notification } from '../models'
-import Agenda, { PUBLISH_NOTIFICATION_ACTIVATED } from '../Agenda'
+import BusinessAction from '$src/BusinessAction'
+import { Notification } from '$src/models'
+import Agenda, { PUBLISH_NOTIFICATION_ACTIVATED } from '$src/Agenda'
 
 class CreateNotification extends BusinessAction {
   async executePerform () {

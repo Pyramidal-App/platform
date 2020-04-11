@@ -1,5 +1,5 @@
-import BusinessAction from '../BusinessAction'
-import { Notification } from '../models'
+import BusinessAction from '$src/BusinessAction'
+import { Notification } from '$src/models'
 
 class MarkNotificationsRead extends BusinessAction {
   async executePerform() {

@@ -1,5 +1,5 @@
-import BusinessAction from '../BusinessAction.js'
-import { Customer } from '../models'
+import BusinessAction from '$src/BusinessAction'
+import { Customer } from '$src/models'
 
 class UpdateCustomer extends BusinessAction {
   validationConstraints = {
