@@ -11,6 +11,8 @@ import visibleToUser from '$src/Search/search_filters/visibleToUser'
 class SearchCustomers extends Search {
   model = Customer
 
+  static orderableBy = ['createdAt']
+
   isAllowed() {
     const userId = this.params.filters.visibleToUser
     return userId && userId === this.performer.id

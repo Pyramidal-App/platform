@@ -19,6 +19,11 @@ enum TaskStatus {
   CANCELLED
 }
 
+enum SearchOrderDirection {
+  asc
+  desc
+}
+
 interface Record {
   id: ID!
   createdAt: DateTime!
@@ -188,18 +193,23 @@ input PhoneNumberIdentifiers {
   number: String!
 }
 
+enum CustomerSearchOrderIdentifier {
+  createdAt
+}
+
+input CustomerSearchOrder {
+  identifier: CustomerSearchOrderIdentifier!
+  direction: SearchOrderDirection
+}
+
 input CustomerSearchFilters {
   phoneNumber: PhoneNumberIdentifiers,
 }
 
 input CustomerSearchInput {
-  limit: Int
+  page: Int
   filters: CustomerSearchFilters
-}
-
-enum SearchOrderDirection {
-  asc
-  desc
+  orderBy: [CustomerSearchOrder]
 }
 
 enum TaskSearchOrderIdentifier {
