@@ -1,5 +1,5 @@
 import BusinessAction from '$src/BusinessAction'
-import { Customer } from '$src/models'
+import { Customer, CustomersPhoneNumber, PhoneNumber } from '$src/models'
 
 class UpdateCustomer extends BusinessAction {
   validationConstraints = {
@@ -7,22 +7,67 @@ class UpdateCustomer extends BusinessAction {
     name: { presence: true }
   }
 
-  async isAllowed() {
+  async isAllowed () {
     const customer = this._customer()
-    return customer.UserId = this.performer.id
+    return customer.UserId === this.performer.id
   }
 
-  async executePerform() {
-    const { name } = this.params
+  async executePerform () {
+    const { name, phoneNumbers = [] } = this.params
+    const transaction = this.transaction
     const customer = await this._customer()
-    return await customer.update({ name })
+
+    await customer.update({ name })
+
+    debugger
+
+    for (const {
+      id,
+      countryCode,
+      areaCode,
+      number,
+      delete: DELETE
+    } of phoneNumbers) {
+      if (id) {
+        await this._removePhoneNumber(customer.id, id)
+
+        if (!DELETE) {
+          await this._addPhoneNumber(customer.id, countryCode, areaCode, number)
+        }
+      } else {
+        await this._addPhoneNumber(customer.id, countryCode, areaCode, number)
+      }
+    }
+
+    return customer
   }
 
-  async _customer() {
+  async _addPhoneNumber (customerId, countryCode, areaCode, number) {
+    const transaction = this.transaction
+    const [phoneNumber] = await PhoneNumber.findOrCreate({
+      where: { countryCode, areaCode, number },
+      transaction
+    })
+    return await CustomersPhoneNumber.findOrCreate({
+      where: { CustomerId: customerId, PhoneNumberId: phoneNumber.id },
+      transaction
+    })
+  }
+
+  async _removePhoneNumber (customerId, phoneNumberId) {
+    return await CustomersPhoneNumber.destroy(
+      { where: { CustomerId: customerId, PhoneNumberId: phoneNumberId } },
+      { transaction: this.transaction }
+    )
+  }
+
+  async _customer () {
     if (!this.__customer) {
-      this.__customer = await Customer.findByPk(this.params.id)
+      this.__customer = Customer.findByPk(this.params.id, {
+        transaction: this.transaction
+      })
     }
-    return this.__customer
+    return await this.__customer
   }
 }
 

@@ -241,11 +241,17 @@ input TaskSearchInput {
   filters: TaskSearchFilters
 }
 
+input CustomerPhoneNumberInput {
+  id: ID
+  delete: Boolean
+  countryCode: String
+  areaCode: String
+  number: String
+}
+
 input CreateCustomerInput {
   name: String!
-  phoneNumberCountryCode: String!
-  phoneNumberAreaCode: String!
-  phoneNumber: String!
+  phoneNumbers: [CustomerPhoneNumberInput]
   addressGooglePlaceId: String!
   addressLabel: String!
   addressNotes: String
@@ -256,6 +262,7 @@ input CreateCustomerInput {
 input UpdateCustomerInput {
   id: ID!
   name: String!
+  phoneNumbers: [CustomerPhoneNumberInput]
 }
 
 input UpdateAddressInput {

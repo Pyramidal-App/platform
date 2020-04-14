@@ -18,12 +18,6 @@ class CreateCustomer extends BusinessAction {
       name: { presence: { allowEmpty: false } },
 
       ...allOrNone(this.params, [
-        'phoneNumberCountryCode',
-        'phoneNumberAreaCode',
-        'phoneNumber'
-      ]),
-
-      ...allOrNone(this.params, [
         'addressGooglePlaceId',
         'addressLabel',
         'addressLat',
@@ -35,9 +29,7 @@ class CreateCustomer extends BusinessAction {
   async executePerform () {
     const {
       name,
-      phoneNumberCountryCode,
-      phoneNumberAreaCode,
-      phoneNumber,
+      phoneNumbers,
       addressGooglePlaceId,
       addressLabel,
       addressNotes,
@@ -49,22 +41,9 @@ class CreateCustomer extends BusinessAction {
 
     const customer = await Customer.create({ UserId: this.performer.id, name }, { transaction })
 
-    const [dbPhoneNumber] = await PhoneNumber.findOrCreate({
-      where: {
-        countryCode: phoneNumberCountryCode,
-        areaCode: phoneNumberAreaCode,
-        number: phoneNumber
-      },
-      transaction
-    })
-
-    await CustomersPhoneNumber.findOrCreate({
-      where: {
-        CustomerId: customer.id,
-        PhoneNumberId: dbPhoneNumber.id
-      },
-      transaction
-    })
+    for (const pnData of phoneNumbers) {
+      await this._associatePhoneNumber(customer.id, pnData)
+    }
 
     const address = await Address.create({
       CustomerId: customer.id,
@@ -75,11 +54,22 @@ class CreateCustomer extends BusinessAction {
       lng: addressLng
     }, { transaction })
 
-    return {
-      ...customer.dataValues,
-      addresses: [address.dataValues],
-      phoneNumbers: [dbPhoneNumber.dataValues]
-    }
+    return customer
+  }
+
+  async _associatePhoneNumber(customerId, { countryCode, areaCode, number }) {
+    const [dbPhoneNumber] = await PhoneNumber.findOrCreate({
+      where: { countryCode, areaCode, number },
+      transaction: this.transaction
+    })
+
+    await CustomersPhoneNumber.findOrCreate({
+      where: {
+        CustomerId: customerId,
+        PhoneNumberId: dbPhoneNumber.id
+      },
+      transaction: this.transaction
+    })
   }
 }
 
