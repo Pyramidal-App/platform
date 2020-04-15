@@ -20,9 +20,10 @@ The main dependencies for this app are PostgreSQL and MongoDB database engines.
 
 Once installed, you need to setup the password of the PostgreSQL default user "postgres" to "postgres" (yes, username and password are the same).
 
-~~~bash
+~~~sql
 $ sudo -u postgres psql postgres
-postgres=# \password postgres
+postgres=# ALTER USER postgres WITH PASSWIRD 'password'; # if postgres user exists
+postgres=# CREATE USER postgres WITH PASSWORD 'password'; # if postgres user does not exist
 ~~~
 
 The default username and password are set in [db/config.js](https://github.com/Pyramidal-App/platform/blob/master/db/config.js), and can also be overriden at run time by passing `DB_USERNAME` and `DB_PASSWORD` bash environment variables.
