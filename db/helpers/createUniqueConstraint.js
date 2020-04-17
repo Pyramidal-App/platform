@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 const createUniqueConstraint = (table, columns, options = {}) => {
   const constraintName = `${table}_unique_${columns.join('_')}`
@@ -10,7 +10,8 @@ const createUniqueConstraint = (table, columns, options = {}) => {
       ...options
     })
 
-  const down = queryInterface => queryInterface.removeConstraint(table, constraintName)
+  const down = queryInterface =>
+    queryInterface.removeConstraint(table, constraintName)
 
   return { up, down }
 }

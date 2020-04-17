@@ -31,6 +31,7 @@ import CreateCall from './business_actions/CreateCall'
 import CreateTeam from './business_actions/CreateTeam'
 import InviteToTeam from './business_actions/InviteToTeam'
 import UpdateCurrentUser from './business_actions/UpdateCurrentUser'
+import SearchArgentinaAreaCodes from './business_actions/SearchArgentinaAreaCodes'
 
 import TelemarketingSheetResolver from './typeResolvers/TelemarketingSheetResolver'
 
@@ -60,7 +61,8 @@ const Server = new ApolloServer({
       telemarketingSheets: resolveWithBA(ListTelemarketingSheets, {
         passingInput: false
       }),
-      currentUser: (_root, _args, { currentUser }) => currentUser
+      currentUser: (_root, _args, { currentUser }) => currentUser,
+      argentinaAreaCodes: resolveWithBA(SearchArgentinaAreaCodes, { passingInput: false })
     },
 
     Mutation: {

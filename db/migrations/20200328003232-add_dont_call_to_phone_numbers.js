@@ -1,6 +1,8 @@
-'use strict';
+'use strict'
 
 module.exports = {
-  up: (queryInterface, Sequelize) => queryInterface.addColumn('PhoneNumbers', 'dontCall', Sequelize.BOOLEAN),
-  down: (queryInterface, Sequelize) => queryInterface.removeColumn('PhoneNumbers', 'dontCall')
-};
+  up: (queryInterface, Sequelize) =>
+    queryInterface.addColumn('PhoneNumbers', 'dontCall', Sequelize.BOOLEAN),
+  down: (queryInterface, Sequelize) =>
+    queryInterface.removeColumn('PhoneNumbers', 'dontCall')
+}

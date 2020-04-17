@@ -1,9 +1,15 @@
-'use strict';
+'use strict'
 
 module.exports = {
   up: (queryInterface, Sequelize) =>
-    queryInterface.changeColumn('Users', 'name', { type: Sequelize.STRING, allowNull: true }),
+    queryInterface.changeColumn('Users', 'name', {
+      type: Sequelize.STRING,
+      allowNull: true
+    }),
 
   down: (queryInterface, Sequelize) =>
-    queryInterface.changeColumn('Users', 'name', { type: Sequelize.STRING, allowNull: false })
-};
+    queryInterface.changeColumn('Users', 'name', {
+      type: Sequelize.STRING,
+      allowNull: false
+    })
+}

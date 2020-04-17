@@ -10,6 +10,7 @@ import Task from './Task'
 import Team from './Team'
 import TeamMembership from './TeamMembership'
 import Notification from './Notification'
+import ArgentinaAreaCode from './ArgentinaAreaCode'
 
 User.hasMany(TelemarketingSheet)
 User.hasMany(Customer)
@@ -72,5 +73,6 @@ export {
   Task,
   Team,
   TeamMembership,
-  Notification
+  Notification,
+  ArgentinaAreaCode
 }

@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('TeamMemberships', {
@@ -19,7 +19,7 @@ module.exports = {
         references: { model: 'Users', id: 'id' }
       },
       admin: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,
@@ -29,14 +29,18 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
-
-    await queryInterface.addConstraint('TeamMemberships', ['TeamId', 'UserId'], {
-      type: 'unique',
-      name: 'unique_team_memberships'
     })
+
+    await queryInterface.addConstraint(
+      'TeamMemberships',
+      ['TeamId', 'UserId'],
+      {
+        type: 'unique',
+        name: 'unique_team_memberships'
+      }
+    )
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('TeamMemberships')
   }
-};
+}

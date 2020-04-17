@@ -1,15 +1,10 @@
-'use strict';
+'use strict'
 
 const createEnum = require('../helpers/createEnum')
 const dropType = require('../helpers/dropType')
 
 const ENUM_NAME = 'call_outcome'
-const ENUM_VALUES = [
-  'DIDNT_ANSWER',
-  'NOT_INTERESTED',
-  'SUCCESS',
-  'DONT_CALL'
-]
+const ENUM_VALUES = ['DIDNT_ANSWER', 'NOT_INTERESTED', 'SUCCESS', 'DONT_CALL']
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -24,7 +19,7 @@ module.exports = {
       },
       outcome: {
         type: ENUM_NAME,
-        allowNull: false,
+        allowNull: false
       },
       dateTime: {
         type: Sequelize.DATE,
@@ -53,10 +48,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
+    })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Calls');
+    await queryInterface.dropTable('Calls')
     await dropType(queryInterface, ENUM_NAME)
   }
-};
+}

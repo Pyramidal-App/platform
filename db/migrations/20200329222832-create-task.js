@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 const createEnum = require('../helpers/createEnum')
 const dropType = require('../helpers/dropType')
@@ -9,7 +9,11 @@ const STATUS_ENUM = 'task_status'
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await createEnum(queryInterface, TYPE_ENUM, ['CALL', 'VISIT'])
-    await createEnum(queryInterface, STATUS_ENUM, ['PENDING', 'COMPLETED', 'CANCELLED'])
+    await createEnum(queryInterface, STATUS_ENUM, [
+      'PENDING',
+      'COMPLETED',
+      'CANCELLED'
+    ])
 
     await queryInterface.createTable('Tasks', {
       id: {
@@ -52,11 +56,11 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    });
+    })
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Tasks');
+    await queryInterface.dropTable('Tasks')
     await dropType(queryInterface, TYPE_ENUM)
     await dropType(queryInterface, STATUS_ENUM)
   }
-};
+}

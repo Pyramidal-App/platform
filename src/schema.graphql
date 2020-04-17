@@ -167,6 +167,12 @@ type Notification {
   payload: Task!
 }
 
+type ArgentinaAreaCodeMatch {
+  areaCode: String!
+  province: String!
+  matchedLocalities: [String]!
+}
+
 type UserAndToken {
   token: String!
   user: User!
@@ -324,6 +330,7 @@ type Query {
   telemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet
   telemarketingSheets: [TelemarketingSheet]
   currentUser: User
+  argentinaAreaCodes(filter: String!): [ArgentinaAreaCodeMatch]!
 }
 
 type Subscription {
