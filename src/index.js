@@ -34,7 +34,7 @@ const start = async _ => {
     console.log('✔ Agenda started');
   }
 
-  const { url, subscriptionsUrl } = await Server.listen(PORT)
+  const { url, subscriptionsUrl } = await Server.listen(PORT, '0.0.0.0')
   console.log(`🚀 Server ready at ${url}`)
   console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`)
 }
