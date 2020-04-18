@@ -9,7 +9,8 @@
     "dbconsole": "sudo su postgres -c 'psql ${DB_NAME:-pyramidal_platform_development}'",
     "seq": "sequelize-cli",
     "agrendash": "agendash --db $AGENDA_MONGO_DB_URL",
-    "doc": "nodemon -w src -e js,graphql -x esdoc"
+    "doc": "nodemon -w src -e js,graphql -x esdoc",
+    "build": "babel src --out-dir dist"
   },
   "dependencies": {
     "@babel/plugin-proposal-pipeline-operator": "^7.8.3",
