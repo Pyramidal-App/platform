@@ -9,7 +9,7 @@ const visibleToUser = async (queryOptions, userId) => {
   const user = await User.findByPk(userId)
   const [team] = await user.getTeams()
   const teamMembers = team && await team.getMembers()
-  const teamMemberIds = team && teamMembers.map(tm => tm.id)
+  const teamMemberIds = team ? teamMembers.map(tm => tm.id) : []
 
   return where(queryOptions, { UserId: [userId, ...teamMemberIds] })
 }

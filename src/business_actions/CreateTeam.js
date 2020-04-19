@@ -54,7 +54,7 @@ class CreateTeam extends BusinessAction {
           transaction
         })
 
-        await TeamMembership.create({ TeamId: team.id, UserId: user.id }, { transaction })
+        await TeamMembership.findOrCreate({ where: { TeamId: team.id, UserId: user.id }, transaction })
       })
     )
 
