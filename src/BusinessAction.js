@@ -12,10 +12,10 @@ const isPlainObject = obj =>
  * Raised when action validation fails.
  */
 class BusinessActionValidationError extends Error {
-  constructor (ba, errors) {
+  constructor (ba) {
     super('Business action validation error')
     this.businessAction = ba
-    this.errors = ba.errors
+    this.errors = { ...ba.errors }
   }
 }
 
@@ -114,7 +114,7 @@ class BusinessAction {
    * @type {object}
    * @private
    */
-  errors = []
+  errors = {}
 
   /**
    * @deprecated
@@ -294,20 +294,20 @@ class BusinessAction {
 
   /**
    * @private
-   * TODO: hide implmentation details for error handling in another class
    */
   hasErrors () {
-    return !!Object.entries(this.errors).find(
-      ([field, errors]) => errors.length > 0
-    )
+    return !!Object.values(this.errors).find(errors => errors.length > 0)
   }
 
   /**
    * @private
    */
-  addError (path, error) {
-    if (!error) return
-    update(this.errors, path, (errors = []) => [...errors, error])
+  addError (path, message) {
+    if (!message) return
+    this.errors = update({ ...this.errors }, path, (messages = []) => [
+      ...messages,
+      message
+    ])
   }
 
   /**

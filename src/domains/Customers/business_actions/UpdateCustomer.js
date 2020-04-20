@@ -19,8 +19,6 @@ class UpdateCustomer extends BusinessAction {
 
     await customer.update({ name })
 
-    debugger
-
     for (const {
       id,
       countryCode,

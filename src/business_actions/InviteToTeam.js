@@ -7,14 +7,11 @@ class InviteToTeam extends BusinessAction {
     email: {
       presence: { allowEmpty: false },
       unique: {
-        getRecordCount: async email => {
-          console.log('QWER')
-
-          return await TeamMembership.count({
+        getRecordCount: async email =>
+          await TeamMembership.count({
             where: { TeamId: this.params.teamId },
             include: [{ model: User, required: true, where: { email } }]
-          })
-        },
+          }),
         message: '^Este usuario ya pertenece a este equipo'
       }
     }
@@ -32,8 +29,6 @@ class InviteToTeam extends BusinessAction {
   }
 
   async executePerform () {
-    console.log('ASDF')
-
     const { teamId, email } = this.params
     const transaction = this.transaction
 
