@@ -1,6 +1,5 @@
 import Search, { where, include } from '$src/Search'
 import { Customer, PhoneNumber } from '$src/models'
-import visibleToUser from '$src/Search/search_filters/visibleToUser'
 
 /**
  *https://9gag.com/gag/an5LgLV The decision to extend BusinessAction is temporal.
@@ -13,14 +12,7 @@ class SearchCustomers extends Search {
 
   static orderableBy = ['createdAt']
 
-  isAllowed() {
-    const userId = this.params.filters.visibleToUser
-    return userId && userId === this.performer.id
-  }
-
   static filters = {
-    visibleToUser,
-
     phoneNumber(queryOptions, value) {
       if (!value) { return queryOptions }
 
@@ -30,6 +22,11 @@ class SearchCustomers extends Search {
         model: PhoneNumber,
         where: { countryCode, areaCode, number }
       }])
+    },
+
+    id(queryOptions, value) {
+      const id = typeof value === 'string' ? value.match(/^(\d+)/)[1] : value
+      return where(queryOptions, { id })
     }
   }
 }

@@ -3,7 +3,6 @@ import { Op } from 'sequelize'
 import { Task } from '$src/models'
 import Search, { where } from '$src/Search'
 
-import visibleToUser from '$src/Search/search_filters/visibleToUser'
 import opFilter from '$src/Search/search_filters/opFilter'
 
 /**
@@ -16,7 +15,7 @@ class SearchTasks extends Search {
 
   static orderableBy = ['dueDate', 'createdAt']
 
-  static filters = {
+  filters = {
     assignedToUser: opFilter('UserId'),
     customerId: opFilter('CustomerId'),
     status: opFilter('status'),
@@ -25,11 +24,6 @@ class SearchTasks extends Search {
     maxCreatedAt: opFilter('createdAt', Op.lte),
     minDueDate: opFilter('dueDate', Op.gte),
     maxDueDate: opFilter('dueDate', Op.lte),
-  }
-
-  isAllowed () {
-    const userId = this.params.filters.assignedToUser
-    return userId && userId === this.performer.id
   }
 }
 

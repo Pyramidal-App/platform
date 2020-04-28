@@ -2,6 +2,24 @@ import update from 'lodash.update'
 import toPairs from 'lodash.topairs'
 import BusinessAction from '$src/BusinessAction'
 
+import visibleToUser from './search_filters/visibleToUser'
+
+/**
+ * A helper to manipulate queryOptions object
+ */
+const include = ({ include, ...queryOptions }, newInclude) => ({
+  ...queryOptions,
+  include: [...include, ...newInclude]
+})
+
+/**
+ * A helper to manipulate queryOptions object
+ */
+const where = ({ where, ...queryOptions }, whereClauses) => ({
+  ...queryOptions,
+  where: { ...where, ...whereClauses }
+})
+
 /**
  * Raised when a search is called with a filter that is not defined.
  */
@@ -53,8 +71,23 @@ class Search extends BusinessAction {
    * @param orderBy  of records to retrieve
    * @param filters of records to retrieve
    */
-  constructor({ limit, orderBy = [], filters = {}, page, recordsPerPage }, ...args) {
-    super({ limit, orderBy, filters, page, recordsPerPage }, ...args)
+  constructor({ orderBy = [], filters = {}, page, recordsPerPage }, ...args) {
+    super({ orderBy, filters, page, recordsPerPage }, ...args)
+  }
+
+  /*
+   * @todo This either needs killing or a compliment. Not sure.
+   */
+  static visibleToUser(userId) {
+    return class extends this {
+      async _queryOptions(...args) {
+        return (
+          super._queryOptions(...args)
+          |> await(#)
+          |> visibleToUser(#, userId)
+        )
+      }
+    }
   }
 
   /*
@@ -72,7 +105,7 @@ class Search extends BusinessAction {
       totalPages: Math.ceil(count / this._recordsPerPage()),
       recordsPerPage: this._recordsPerPage(),
       total: count,
-      data: rows,
+      data: rows
     }
   }
 
@@ -88,7 +121,7 @@ class Search extends BusinessAction {
       order: [],
       transaction: this.transaction,
       limit: this._recordsPerPage(),
-      offset: this._page() && this._page() - 1
+      offset: this._page() && (this._page() - 1) * this._recordsPerPage()
     }
 
     for (const [filterName, filterValue] of toPairs(this.params.filters)) {
@@ -115,22 +148,6 @@ class Search extends BusinessAction {
     return this.params.page
   }
 }
-
-/**
- * A helper to manipulate queryOptions object
- */
-const include = ({ include, ...queryOptions }, newInclude) => ({
-  ...queryOptions,
-  include: [...include, ...newInclude]
-})
-
-/**
- * A helper to manipulate queryOptions object
- */
-const where = ({ where, ...queryOptions }, whereClauses) => ({
-  ...queryOptions,
-  where: { ...where, ...whereClauses }
-})
 
 export { where, include }
 export default Search

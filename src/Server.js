@@ -3,6 +3,7 @@ import { ApolloServer, gql, withFilter } from 'apollo-server'
 import { Op } from 'sequelize'
 import { GraphQLDateTime } from 'graphql-iso-date'
 import set from 'lodash.set'
+import slugify from '@sindresorhus/slugify'
 
 import {
   Customer,
@@ -11,16 +12,21 @@ import {
   Task,
   Team,
   TeamMembership,
-  Notification
+  Notification,
+  PhoneNumber
 } from './models'
+
 import typeDefs from './schema.graphql'
-import resolveWithBA from './resolveWithBA.js'
 import AuthService from './AuthService'
 import pubSub, { NOTIFICATION_ACTIVATED } from './pubSub'
+
+import resolveWithBA from './resolveWithBA.js'
+import resolveWithSearch from './resolveWithSearch'
 
 import Tasks from '$src/domains/Tasks'
 import Notifications from '$src/domains/Notifications'
 import Customers from '$src/domains/Customers'
+import InteractionRegistry from '$src/domains/InteractionRegistry'
 
 import LogInWithGoogle from './business_actions/LogInWithGoogle'
 import FindOrCreateTelemarketingSheet from './business_actions/FindOrCreateTelemarketingSheet'
@@ -34,6 +40,7 @@ import UpdateCurrentUser from './business_actions/UpdateCurrentUser'
 import SearchArgentinaAreaCodes from './business_actions/SearchArgentinaAreaCodes'
 
 import TelemarketingSheetResolver from './typeResolvers/TelemarketingSheetResolver'
+import CallResolver from './typeResolvers/CallResolver'
 
 const Server = new ApolloServer({
   extensions: [_ => new ApolloLogExtension()],
@@ -98,6 +105,7 @@ const Server = new ApolloServer({
       }
     },
 
+    Call: CallResolver,
     TelemarketingSheet: TelemarketingSheetResolver,
 
     Customer: {
@@ -110,19 +118,15 @@ const Server = new ApolloServer({
       tasks: async customer =>
         await new Customer({ id: customer.id }).getTasks(),
       userId: customer => customer.UserId,
-      user: async customer => await User.findByPk(customer.UserId)
-    },
-
-    Call: {
-      user: async call => await User.findByPk(call.UserId),
-      customer: async call => await Customer.findByPk(call.CustomerId),
-      notes: async call => await new Call({ id: call.id }).getNotes()
+      user: async customer => await User.findByPk(customer.UserId),
+      slug: customer => slugify(`${customer.id}-${customer.name}`),
+      calls: resolveWithSearch(InteractionRegistry.search)
     },
 
     Task: {
       user: async task => await User.findByPk(task.UserId),
       customer: async task => await Customer.findByPk(task.CustomerId),
-      triggererCall: async task => await Call.findByPk(task.TriggererCallId)
+      triggererCall: async task => await Call.findByPk(task.TriggererCallId),
     },
 
     User: {
@@ -131,11 +135,7 @@ const Server = new ApolloServer({
         return teams[0]
       },
 
-      tasks: async (user, { input: searchParams }, { currentUser }) =>
-        await new Tasks.search(
-          set({ ...searchParams }, 'filters.assignedToUser', currentUser.id),
-          currentUser
-        ).perform(),
+      tasks: resolveWithSearch(Tasks.search),
 
       notifications: async (user, vars) => {
         const filters = vars.hasOwnProperty('read') ? { read: vars.read } : {}
@@ -148,11 +148,7 @@ const Server = new ApolloServer({
         return notifications
       },
 
-      customers: async (user, { input: searchParams }, { currentUser }) =>
-        await new Customers.search(
-          set({ ...searchParams }, 'filters.visibleToUser', currentUser.id),
-          currentUser
-        ).perform()
+      customers: resolveWithSearch(Customers.search)
     },
 
     Team: {
@@ -163,6 +159,10 @@ const Server = new ApolloServer({
 
     TeamMembership: {
       user: async membership => await User.findByPk(membership.UserId)
+    },
+
+    PhoneNumber: {
+      displayValue: pn => `+${pn.countryCode} - ${pn.areaCode} - ${pn.number}`
     }
   }
 })

@@ -51,12 +51,13 @@ type User {
 
 type Customer implements Record {
   id: ID!
+  slug: String!
   name: String!
   userId: ID!
   user: User!
   phoneNumbers: [PhoneNumber]!
   addresses: [Address]!
-  calls: [Call]!
+  calls(input: CallSearchInput): CallPage!
   tasks: [Task]!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -70,12 +71,21 @@ type TaskPage implements RecordPage {
   data: [Task]!
 }
 
+type CallPage implements RecordPage {
+  page: Int
+  totalPages: Int
+  total: Int
+  recordsPerPage: Int
+  data: [Call]!
+}
+
 type PhoneNumber {
   id: ID!
   customers: [Customer]!
   countryCode: String!
   areaCode: String!
   number: String!
+  displayValue: String!
 }
 
 type Address {
@@ -85,7 +95,7 @@ type Address {
   googlePlaceId: String!
   lat: Float!
   lng: Float!
-  notes: String!
+  notes: String
 }
 
 type TelemarketingSheet {
@@ -104,14 +114,17 @@ type TelemarketingSheetNumberInfo {
   dontCall: Boolean!
 }
 
-type Call {
+type Call implements Record {
   id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   phoneNumber: PhoneNumber!
   customer: Customer!
   user: User!
   notes: [Note]!
   outcome: CallOutcome!
   dateTime: DateTime!
+  displayOutcome: String!
 }
 
 type Note {
@@ -210,12 +223,37 @@ input CustomerSearchOrder {
 
 input CustomerSearchFilters {
   phoneNumber: PhoneNumberIdentifiers,
+  id: String
 }
 
 input CustomerSearchInput {
   page: Int
+  recordsPerPage: Int
+  limit: Int
   filters: CustomerSearchFilters
   orderBy: [CustomerSearchOrder]
+}
+
+input CallSearchFilters {
+  customerId: Int
+}
+
+enum CallSearchOrderIdentifier {
+  createdAt
+  dateTime
+}
+
+input CallSearchOrder {
+  identifier: CallSearchOrderIdentifier
+  direction: SearchOrderDirection
+}
+
+input CallSearchInput {
+  page: Int
+  recordsPerPage: Int
+  limit: Int
+  filters: CallSearchFilters
+  orderBy: [CallSearchOrder]
 }
 
 enum TaskSearchOrderIdentifier {

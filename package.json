@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@babel/plugin-proposal-pipeline-operator": "^7.8.3",
+    "@sindresorhus/slugify": "^0.11.0",
     "agenda": "^3.0.0",
     "apollo-log": "^0.1.0",
     "apollo-server": "^2.11.0",
