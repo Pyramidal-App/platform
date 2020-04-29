@@ -58,7 +58,8 @@ type Customer implements Record {
   phoneNumbers: [PhoneNumber]!
   addresses: [Address]!
   calls(input: CallSearchInput): CallPage!
-  tasks: [Task]!
+  tasks(input: TaskSearchInput): TaskPage!
+  notes: [Note]!
   createdAt: DateTime!
   updatedAt: DateTime!
 }

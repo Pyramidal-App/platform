@@ -2,9 +2,9 @@ import Search from '$src/Search'
 import { Call } from '$src/models'
 
 class SearchInteractionRegistry extends Search {
-  model = Call
+  static model = Call
   static orderableBy = ['createdAt', 'dateTime']
-  filters = {}
+  static filters = {}
 }
 
 export default SearchInteractionRegistry

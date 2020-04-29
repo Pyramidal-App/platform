@@ -8,8 +8,7 @@ import { Customer, PhoneNumber } from '$src/models'
  * which makes extending BusinessAction sound better.
  */
 class SearchCustomers extends Search {
-  model = Customer
-
+  static model = Customer
   static orderableBy = ['createdAt']
 
   static filters = {

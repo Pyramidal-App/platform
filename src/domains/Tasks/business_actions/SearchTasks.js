@@ -11,11 +11,9 @@ import opFilter from '$src/Search/search_filters/opFilter'
  * @extends {BusinessAction}
  */
 class SearchTasks extends Search {
-  model = Task
-
+  static model = Task
   static orderableBy = ['dueDate', 'createdAt']
-
-  filters = {
+  static filters = {
     assignedToUser: opFilter('UserId'),
     customerId: opFilter('CustomerId'),
     status: opFilter('status'),

@@ -25,7 +25,13 @@ const where = ({ where, ...queryOptions }, whereClauses) => ({
  */
 class UndefinedSearchFilterError extends Error {
   constructor(filterName) {
-    super(`Filter definition for "${filterName}" is undefined`)
+    super(`Filter definition for "${filterName}" is missing`)
+  }
+}
+
+class UnsupportedSearchOrderIdentifier extends Error  {
+  constructor(identifier) {
+    super(`Unsupported search order identifier ${identifier}`)
   }
 }
 
@@ -39,7 +45,7 @@ class Search extends BusinessAction {
    * The model to query over.
    * @abstract
    */
-  model = undefined
+  static model = undefined
 
   /**
    * Override with an object.
@@ -63,16 +69,24 @@ class Search extends BusinessAction {
    * functions that implement these filters.
    * @abstract
    */
-  filters = {}
+  static filters = {}
 
   /**
    * @constructor
-   * @param limit Number of records to retrieve
-   * @param orderBy  of records to retrieve
-   * @param filters of records to retrieve
+   * @param {array} orderBy Order to sort records by
+   * @param {object} filters of records to retrieve
+   * @param {integer} page
+   * @param {integer} recordsPerPage
+   * @param {object} queryOptions Options passed to model.findAndCountAll
    */
-  constructor({ orderBy = [], filters = {}, page, recordsPerPage }, ...args) {
-    super({ orderBy, filters, page, recordsPerPage }, ...args)
+  constructor({
+    orderBy = [],
+    filters = {},
+    page,
+    recordsPerPage,
+    queryOptions = {}
+  }, ...args) {
+    super({ orderBy, filters, page, recordsPerPage, queryOptions }, ...args)
   }
 
   /*
@@ -98,7 +112,9 @@ class Search extends BusinessAction {
     const queryOptions = await this._queryOptions()
 
     const { rows, count } =
-      await this.model.findAndCountAll(queryOptions)
+      await this.constructor.model.findAndCountAll(queryOptions)
+
+    debugger
 
     return {
       page: this._page(),
@@ -116,9 +132,9 @@ class Search extends BusinessAction {
    */
   async _queryOptions() {
     let accumulator = {
-      where: {},
-      include: [],
-      order: [],
+      where: this.params.queryOptions.where || {},
+      include: this.params.queryOptions.include || [],
+      order: this.params.queryOptions.order || [],
       transaction: this.transaction,
       limit: this._recordsPerPage(),
       offset: this._page() && (this._page() - 1) * this._recordsPerPage()
@@ -131,9 +147,11 @@ class Search extends BusinessAction {
     }
 
     for (const { identifier, direction } of this.params.orderBy) {
-      if (this.constructor.orderableBy.includes(identifier)) {
-        accumulator = update(accumulator, 'order', order => [...order, [identifier, direction]] )
+      if (!this.constructor.orderableBy.includes(identifier)) {
+        throw new UnsupportedSearchOrderIdentifier(identifier)
       }
+
+      accumulator = update(accumulator, 'order', order => [...order, [identifier, direction]] )
     }
 
     return accumulator

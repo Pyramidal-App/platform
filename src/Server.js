@@ -115,12 +115,12 @@ const Server = new ApolloServer({
         await new Customer({ id: customer.id }).getAddresses(),
       calls: async customer =>
         await new Customer({ id: customer.id }).getCalls(),
-      tasks: async customer =>
-        await new Customer({ id: customer.id }).getTasks(),
+      tasks: resolveWithSearch(Tasks.search, customer => ({ where: { CustomerId: customer.id } })),
       userId: customer => customer.UserId,
       user: async customer => await User.findByPk(customer.UserId),
       slug: customer => slugify(`${customer.id}-${customer.name}`),
-      calls: resolveWithSearch(InteractionRegistry.search)
+      calls: resolveWithSearch(InteractionRegistry.search, customer => ({ where: { CustomerId: customer.id } })),
+      notes: async customer => await Note.findAll({ where: { CustomerId: customer.id } })
     },
 
     Task: {
