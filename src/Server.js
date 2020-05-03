@@ -13,7 +13,8 @@ import {
   Team,
   TeamMembership,
   Notification,
-  PhoneNumber
+  PhoneNumber,
+  Note
 } from './models'
 
 import typeDefs from './schema.graphql'
@@ -27,6 +28,7 @@ import Tasks from '$src/domains/Tasks'
 import Notifications from '$src/domains/Notifications'
 import Customers from '$src/domains/Customers'
 import InteractionRegistry from '$src/domains/InteractionRegistry'
+import Notes from '$src/domains/Notes'
 
 import LogInWithGoogle from './business_actions/LogInWithGoogle'
 import FindOrCreateTelemarketingSheet from './business_actions/FindOrCreateTelemarketingSheet'
@@ -120,7 +122,7 @@ const Server = new ApolloServer({
       user: async customer => await User.findByPk(customer.UserId),
       slug: customer => slugify(`${customer.id}-${customer.name}`),
       calls: resolveWithSearch(InteractionRegistry.search, customer => ({ where: { CustomerId: customer.id } })),
-      notes: async customer => await Note.findAll({ where: { CustomerId: customer.id } })
+      notes: resolveWithSearch(Notes.search, customer => ({ where: { CustomerId: customer.id } }))
     },
 
     Task: {
@@ -163,6 +165,11 @@ const Server = new ApolloServer({
 
     PhoneNumber: {
       displayValue: pn => `+${pn.countryCode} - ${pn.areaCode} - ${pn.number}`
+    },
+
+    Note: {
+      user: async note => await note.getUser(),
+      call: async note => await note.getCall()
     }
   }
 })

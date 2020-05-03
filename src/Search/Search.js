@@ -114,8 +114,6 @@ class Search extends BusinessAction {
     const { rows, count } =
       await this.constructor.model.findAndCountAll(queryOptions)
 
-    debugger
-
     return {
       page: this._page(),
       totalPages: Math.ceil(count / this._recordsPerPage()),

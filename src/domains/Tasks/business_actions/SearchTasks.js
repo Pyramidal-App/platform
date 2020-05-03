@@ -2,7 +2,6 @@ import { Op } from 'sequelize'
 
 import { Task } from '$src/models'
 import Search, { where } from '$src/Search'
-
 import opFilter from '$src/Search/search_filters/opFilter'
 
 /**

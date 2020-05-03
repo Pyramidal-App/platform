@@ -59,7 +59,7 @@ type Customer implements Record {
   addresses: [Address]!
   calls(input: CallSearchInput): CallPage!
   tasks(input: TaskSearchInput): TaskPage!
-  notes: [Note]!
+  notes(input: NoteSearchInput): NotePage!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -128,8 +128,10 @@ type Call implements Record {
   displayOutcome: String!
 }
 
-type Note {
+type Note implements Record {
   id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   user: User!
   customer: Customer
   phoneNumber: PhoneNumber
@@ -155,6 +157,14 @@ type CustomerPage implements RecordPage {
   total: Int
   recordsPerPage: Int
   data: [Customer]!
+}
+
+type NotePage implements RecordPage {
+  page: Int
+  totalPages: Int
+  total: Int
+  recordsPerPage: Int
+  data: [Note]!
 }
 
 type Team {
@@ -233,6 +243,22 @@ input CustomerSearchInput {
   limit: Int
   filters: CustomerSearchFilters
   orderBy: [CustomerSearchOrder]
+}
+
+enum NoteSearchOrderIdentifier {
+  createdAt
+}
+
+input NoteSearchOrder {
+  identifier: NoteSearchOrderIdentifier!
+  direction: SearchOrderDirection
+}
+
+input NoteSearchInput {
+  page: Int
+  recordsPerPage: Int
+  limit: Int
+  orderBy: [NoteSearchOrder]
 }
 
 input CallSearchFilters {
