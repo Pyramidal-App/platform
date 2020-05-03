@@ -94,7 +94,9 @@ const Server = new ApolloServer({
 
       markNotificationsRead: resolveWithBA(Notifications.markAsRead, {
         passingInput: false
-      })
+      }),
+
+      createNote: resolveWithBA(Notes.create)
     },
 
     Subscription: {

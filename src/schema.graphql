@@ -374,6 +374,11 @@ input UpdateCurrentUserInput {
   name: String!
 }
 
+input CreateNoteInput {
+  contactId: ID!
+  body: String!
+}
+
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
   findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
@@ -389,6 +394,8 @@ type Mutation {
   createTask(input: CreateTaskInput!): Task!
   cancelTask(taskId: ID!): Task!
   completeTask(taskId: ID!): Task!
+
+  createNote(input: CreateNoteInput!): Note!
 }
 
 type Query {

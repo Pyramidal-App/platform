@@ -11,14 +11,8 @@ Note.init({
     type: Sequelize.INTEGER,
     allowNull: false
   },
-  CallId: {
-    type: Sequelize.INTEGER,
-    allowNull: false
-  },
-  PhoneNumberId: {
-    type: Sequelize.INTEGER,
-    allowNull: false
-  },
+  CallId: Sequelize.INTEGER,
+  PhoneNumberId: Sequelize.INTEGER,
   body: {
     type: Sequelize.STRING,
     allowNull: false
