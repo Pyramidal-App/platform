@@ -45,14 +45,16 @@ class CreateCustomer extends BusinessAction {
       await this._associatePhoneNumber(customer.id, pnData)
     }
 
-    const address = await Address.create({
-      CustomerId: customer.id,
-      googlePlaceId: addressGooglePlaceId,
-      label: addressLabel,
-      notes: addressNotes,
-      lat: addressLat,
-      lng: addressLng
-    }, { transaction })
+    if (addressLat) {
+      const address = await Address.create({
+        CustomerId: customer.id,
+        googlePlaceId: addressGooglePlaceId,
+        label: addressLabel,
+        notes: addressNotes,
+        lat: addressLat,
+        lng: addressLng
+      }, { transaction })
+    }
 
     return customer
   }

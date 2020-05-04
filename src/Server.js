@@ -96,7 +96,8 @@ const Server = new ApolloServer({
         passingInput: false
       }),
 
-      createNote: resolveWithBA(Notes.create)
+      createNote: resolveWithBA(Notes.create),
+      deleteNote: resolveWithBA(Notes.delete, { passingInput: false })
     },
 
     Subscription: {

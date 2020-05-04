@@ -31,10 +31,10 @@ interface Record {
 }
 
 interface RecordPage {
-  page: Int
-  totalPages: Int
-  recordsPerPage: Int
-  total: Int
+  page: Int!
+  totalPages: Int!
+  recordsPerPage: Int!
+  total: Int!
   data: [Record]!
 }
 
@@ -65,18 +65,18 @@ type Customer implements Record {
 }
 
 type TaskPage implements RecordPage {
-  page: Int
-  totalPages: Int
-  total: Int
-  recordsPerPage: Int
+  page: Int!
+  totalPages: Int!
+  total: Int!
+  recordsPerPage: Int!
   data: [Task]!
 }
 
 type CallPage implements RecordPage {
-  page: Int
-  totalPages: Int
-  total: Int
-  recordsPerPage: Int
+  page: Int!
+  totalPages: Int!
+  total: Int!
+  recordsPerPage: Int!
   data: [Call]!
 }
 
@@ -152,18 +152,18 @@ type Task implements Record {
 }
 
 type CustomerPage implements RecordPage {
-  page: Int
-  totalPages: Int
-  total: Int
-  recordsPerPage: Int
+  page: Int!
+  totalPages: Int!
+  total: Int!
+  recordsPerPage: Int!
   data: [Customer]!
 }
 
 type NotePage implements RecordPage {
-  page: Int
-  totalPages: Int
-  total: Int
-  recordsPerPage: Int
+  page: Int!
+  totalPages: Int!
+  total: Int!
+  recordsPerPage: Int!
   data: [Note]!
 }
 
@@ -323,11 +323,11 @@ input CustomerPhoneNumberInput {
 input CreateCustomerInput {
   name: String!
   phoneNumbers: [CustomerPhoneNumberInput]
-  addressGooglePlaceId: String!
-  addressLabel: String!
+  addressGooglePlaceId: String
+  addressLabel: String
   addressNotes: String
-  addressLat: Float!
-  addressLng: Float!
+  addressLat: Float
+  addressLng: Float
 }
 
 input UpdateCustomerInput {
@@ -382,8 +382,6 @@ input CreateNoteInput {
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
   findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
-  createCustomer(input: CreateCustomerInput!): Customer!
-  updateCustomer(input: UpdateCustomerInput!): Customer!
   updateAddress(input: UpdateAddressInput!): Address!
   createCall(input: CreateCallInput!): Call!
   createTeam(input: CreateTeamInput!): Team!
@@ -391,11 +389,15 @@ type Mutation {
   updateCurrentUser(input: UpdateCurrentUserInput!): User!
   markNotificationsRead(notificationIds: [ID!]): [Notification]!
 
+  createCustomer(input: CreateCustomerInput!): Customer!
+  updateCustomer(input: UpdateCustomerInput!): Customer!
+
   createTask(input: CreateTaskInput!): Task!
   cancelTask(taskId: ID!): Task!
   completeTask(taskId: ID!): Task!
 
   createNote(input: CreateNoteInput!): Note!
+  deleteNote(noteId: ID!): GenericActionResponse!
 }
 
 type Query {
