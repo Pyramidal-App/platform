@@ -15,6 +15,7 @@ const resolveWithSearch = (
     const params = { ...input, queryOptions: queryOptions(record) }
     const search = new filteredSearch(params, currentUser)
     const result = await search.perform()
+
     return result
   })
 )

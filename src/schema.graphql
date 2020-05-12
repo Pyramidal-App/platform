@@ -31,10 +31,10 @@ interface Record {
 }
 
 interface RecordPage {
-  page: Int!
-  totalPages: Int!
-  recordsPerPage: Int!
-  total: Int!
+  page: Int
+  totalPages: Int
+  recordsPerPage: Int
+  total: Int
   data: [Record]!
 }
 
@@ -65,18 +65,18 @@ type Customer implements Record {
 }
 
 type TaskPage implements RecordPage {
-  page: Int!
-  totalPages: Int!
-  total: Int!
-  recordsPerPage: Int!
+  page: Int
+  totalPages: Int
+  total: Int
+  recordsPerPage: Int
   data: [Task]!
 }
 
 type CallPage implements RecordPage {
-  page: Int!
-  totalPages: Int!
-  total: Int!
-  recordsPerPage: Int!
+  page: Int
+  totalPages: Int
+  total: Int
+  recordsPerPage: Int
   data: [Call]!
 }
 
@@ -152,18 +152,18 @@ type Task implements Record {
 }
 
 type CustomerPage implements RecordPage {
-  page: Int!
-  totalPages: Int!
-  total: Int!
-  recordsPerPage: Int!
+  page: Int
+  totalPages: Int
+  total: Int
+  recordsPerPage: Int
   data: [Customer]!
 }
 
 type NotePage implements RecordPage {
-  page: Int!
-  totalPages: Int!
-  total: Int!
-  recordsPerPage: Int!
+  page: Int
+  totalPages: Int
+  total: Int
+  recordsPerPage: Int
   data: [Note]!
 }
 
@@ -235,6 +235,7 @@ input CustomerSearchOrder {
 input CustomerSearchFilters {
   phoneNumber: PhoneNumberIdentifiers,
   id: String
+  inLimbo: Boolean
 }
 
 input CustomerSearchInput {
