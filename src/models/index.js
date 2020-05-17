@@ -11,6 +11,7 @@ import Team from './Team'
 import TeamMembership from './TeamMembership'
 import Notification from './Notification'
 import ArgentinaAreaCode from './ArgentinaAreaCode'
+import GooglePlace from './GooglePlace'
 
 User.hasMany(TelemarketingSheet)
 User.hasMany(Customer)
@@ -61,6 +62,8 @@ TeamMembership.belongsTo(User)
 
 Notification.belongsTo(User)
 
+GooglePlace.belongsTo(PhoneNumber)
+
 export {
   User,
   TelemarketingSheet,
@@ -74,5 +77,6 @@ export {
   Team,
   TeamMembership,
   Notification,
-  ArgentinaAreaCode
+  ArgentinaAreaCode,
+  GooglePlace
 }

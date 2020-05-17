@@ -40,6 +40,7 @@ import CreateTeam from './business_actions/CreateTeam'
 import InviteToTeam from './business_actions/InviteToTeam'
 import UpdateCurrentUser from './business_actions/UpdateCurrentUser'
 import SearchArgentinaAreaCodes from './business_actions/SearchArgentinaAreaCodes'
+import GetGooglePlacesInfo from './business_actions/GetGooglePlacesInfo'
 
 import TelemarketingSheetResolver from './typeResolvers/TelemarketingSheetResolver'
 import CallResolver from './typeResolvers/CallResolver'
@@ -97,7 +98,9 @@ const Server = new ApolloServer({
       }),
 
       createNote: resolveWithBA(Notes.create),
-      deleteNote: resolveWithBA(Notes.delete, { passingInput: false })
+      deleteNote: resolveWithBA(Notes.delete, { passingInput: false }),
+
+      getGooglePlacesInfo: resolveWithBA(GetGooglePlacesInfo, { passingInput: false })
     },
 
     Subscription: {
@@ -167,12 +170,19 @@ const Server = new ApolloServer({
     },
 
     PhoneNumber: {
-      displayValue: pn => `+${pn.countryCode} - ${pn.areaCode} - ${pn.number}`
+      displayValue: pn => `+${pn.countryCode} - ${pn.areaCode} - ${pn.number}`,
+      telemarketingPrefix: pn => pn.number.slice(0, -2),
+      displayTelemarketingPrefix: pn => `+${pn.countryCode} (${pn.areaCode}) ${pn.number.slice(0, -2)}**`,
+      isMobile: pn => pn.areaCode[0] === '9'
     },
 
     Note: {
       user: async note => await note.getUser(),
       call: async note => await note.getCall()
+    },
+
+    GooglePlace: {
+      phoneNumber: async gp => await gp.getPhoneNumber()
     }
   }
 })
