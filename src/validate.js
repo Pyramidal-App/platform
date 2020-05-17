@@ -9,6 +9,10 @@ validate.validators.custom = async (value, options) => {
 }
 
 validate.validators.aryLength = (value, options) => {
+  if (!Array.isArray(value)) {
+    return ['must be an array']
+  }
+
   if (options.lessThan && value.length < options.lessThan) {
     return [`must be less than ${options.lessThan}`]
   }

@@ -202,6 +202,13 @@ type UserAndToken {
   user: User!
 }
 
+type GooglePlace {
+  googlePlaceId: ID!
+  phoneNumber: PhoneNumber
+  lat: Float!
+  lng: Float!
+}
+
 type GenericActionResponse {
   success: Boolean!
 }
@@ -399,6 +406,8 @@ type Mutation {
 
   createNote(input: CreateNoteInput!): Note!
   deleteNote(noteId: ID!): GenericActionResponse!
+
+  getGooglePlacesInfo(googlePlaceIds: [ID!]): [GooglePlace]!
 }
 
 type Query {
