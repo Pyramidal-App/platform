@@ -86,7 +86,8 @@ const Server = new ApolloServer({
       createTeam: resolveWithBA(Teams.create),
       destroyTeam: resolveWithBA(Teams.destroy, { passingInput: false }),
       inviteToTeam: resolveWithBA(Teams.invite),
-      leaveTeam: resolveWithBA(Teams.leave),
+      leaveTeam: resolveWithBA(Teams.leave, { passingInput: false }),
+      removeTeamMember: resolveWithBA(Teams.removeMember),
 
       createCustomer: resolveWithBA(Customers.create),
       updateCustomer: resolveWithBA(Customers.update),
@@ -164,7 +165,11 @@ const Server = new ApolloServer({
     Team: {
       memberships: async team =>
         await new Team({ id: team.id }).getMemberships(),
-      members: async team => await new Team({ id: team.id }).getMembers()
+      members: async team => await new Team({ id: team.id }).getMembers(),
+      admins: async team => await new Team({ id: team.id }).getMemberships({
+        where: { admin: true },
+        include: [{ model: User }]
+      }).map(tm => tm.User),
     },
 
     TeamMembership: {

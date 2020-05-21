@@ -174,14 +174,17 @@ type Team {
   id: ID!
   name: String!
   memberships: [TeamMembership]!
-  members: [User]!
+  members: [User!]!
+  admins: [User!]!
 }
 
-type TeamMembership {
+type TeamMembership implements Record {
   id: ID!
   team: Team!
   user: User!
   admin: Boolean
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Notification {
@@ -390,6 +393,11 @@ input CreateNoteInput {
   body: String!
 }
 
+input RemoveTeamMemberInput {
+  teamId: ID!
+  teamMembershipId: ID!
+}
+
 type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
   findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
@@ -402,6 +410,7 @@ type Mutation {
   destroyTeam(teamId: ID!): GenericActionResponse!
   leaveTeam(teamId: ID!): GenericActionResponse!
   inviteToTeam(input: InviteToTeamInput!): TeamMembership!
+  removeTeamMember(input: RemoveTeamMemberInput!): GenericActionResponse!
 
   createCustomer(input: CreateCustomerInput!): Customer!
   updateCustomer(input: UpdateCustomerInput!): Customer!

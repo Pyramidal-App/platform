@@ -2,8 +2,8 @@ import TeamsBusinessAction from '../TeamsBusinessAction'
 import { TeamMembership } from '$src/models'
 
 class LeaveTeam extends TeamsBusinessAction {
-  // An admin cannot leave the team,
-  // because it would be left an orphan.
+  // An admin cannot leave the team, because right there can
+  // only be one admin and it would be left an orphan.
   async isAllowed () {
     return !(await this.performerIsTeamAdmin())
   }
@@ -16,7 +16,7 @@ class LeaveTeam extends TeamsBusinessAction {
         UserId: this.performer.id,
         TeamId: teamId
       },
-      transaction:this.transaction
+      transaction: this.transaction
     })
   }
 }
