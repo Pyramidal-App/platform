@@ -395,10 +395,13 @@ type Mutation {
   findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
   updateAddress(input: UpdateAddressInput!): Address!
   createCall(input: CreateCallInput!): Call!
-  createTeam(input: CreateTeamInput!): Team!
-  inviteToTeam(input: InviteToTeamInput!): TeamMembership!
   updateCurrentUser(input: UpdateCurrentUserInput!): User!
   markNotificationsRead(notificationIds: [ID!]): [Notification]!
+
+  createTeam(input: CreateTeamInput!): Team!
+  destroyTeam(teamId: ID!): GenericActionResponse!
+  leaveTeam(teamId: ID!): GenericActionResponse!
+  inviteToTeam(input: InviteToTeamInput!): TeamMembership!
 
   createCustomer(input: CreateCustomerInput!): Customer!
   updateCustomer(input: UpdateCustomerInput!): Customer!

@@ -29,6 +29,7 @@ import Notifications from '$src/domains/Notifications'
 import Customers from '$src/domains/Customers'
 import InteractionRegistry from '$src/domains/InteractionRegistry'
 import Notes from '$src/domains/Notes'
+import Teams from '$src/domains/Teams'
 
 import LogInWithGoogle from './business_actions/LogInWithGoogle'
 import FindOrCreateTelemarketingSheet from './business_actions/FindOrCreateTelemarketingSheet'
@@ -36,8 +37,6 @@ import FindTelemarketingSheet from './business_actions/FindTelemarketingSheet'
 import ListTelemarketingSheets from './business_actions/ListTelemarketingSheets'
 import UpdateAddress from './business_actions/UpdateAddress'
 import CreateCall from './business_actions/CreateCall'
-import CreateTeam from './business_actions/CreateTeam'
-import InviteToTeam from './business_actions/InviteToTeam'
 import UpdateCurrentUser from './business_actions/UpdateCurrentUser'
 import SearchArgentinaAreaCodes from './business_actions/SearchArgentinaAreaCodes'
 import GetGooglePlacesInfo from './business_actions/GetGooglePlacesInfo'
@@ -82,9 +81,12 @@ const Server = new ApolloServer({
       ),
       updateAddress: resolveWithBA(UpdateAddress),
       createCall: resolveWithBA(CreateCall),
-      createTeam: resolveWithBA(CreateTeam),
-      inviteToTeam: resolveWithBA(InviteToTeam),
       updateCurrentUser: resolveWithBA(UpdateCurrentUser),
+
+      createTeam: resolveWithBA(Teams.create),
+      destroyTeam: resolveWithBA(Teams.destroy, { passingInput: false }),
+      inviteToTeam: resolveWithBA(Teams.invite),
+      leaveTeam: resolveWithBA(Teams.leave),
 
       createCustomer: resolveWithBA(Customers.create),
       updateCustomer: resolveWithBA(Customers.update),

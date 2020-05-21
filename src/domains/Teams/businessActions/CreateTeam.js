@@ -1,8 +1,8 @@
 import uniq from 'lodash.uniq'
 
-import { Sequelize, sequelize } from '../db'
-import BusinessAction from '../BusinessAction'
-import { Team, TeamMembership, User } from '../models'
+import { Sequelize } from '$src/db'
+import BusinessAction from '$src/BusinessAction'
+import { Team, TeamMembership, User } from '$src/models'
 
 const COMMA_SEPARATED_EMAILS_REGEX = (_ => {
   const s = /(?:[\s\n\r,]+)/.source // spacing
@@ -29,6 +29,15 @@ class CreateTeam extends BusinessAction {
         message: '^Formato invalido'
       }
     }
+  }
+
+  async isAllowed() {
+    const membershipCount = await TeamMembership.count({
+      where: { UserId: this.performer.id },
+      transaction: this.transaction
+    })
+
+    return membershipCount === 0
   }
 
   async executePerform () {

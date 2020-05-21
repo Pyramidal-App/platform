@@ -13,26 +13,19 @@ class FindOrCreateTelemarketingSheet extends BussinessAction {
       length: { minimum: 2, maximum: 4 }
     },
 
-    firstNumbers: {
-      presence: true,
-      length: { is: 6 }
-    }
+    firstNumbers: { presence: true }
   }
 
   async executePerform () {
     const { countryCode, areaCode, firstNumbers } = this.params
     const UserId = this.performer.id
-    const attributes = { countryCode, areaCode, firstNumbers, UserId }
 
-    const existingSheet = await TelemarketingSheet.findOne({
-      where: attributes
+    const [sheet] = await TelemarketingSheet.findOrCreate({
+      where: { countryCode, areaCode, firstNumbers, UserId },
+      transaction: this.transaction
     })
 
-    if (existingSheet) {
-      return existingSheet
-    } else {
-      return await TelemarketingSheet.create(attributes)
-    }
+    return sheet
   }
 }
 
