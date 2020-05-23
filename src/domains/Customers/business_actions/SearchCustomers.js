@@ -1,6 +1,7 @@
 import seq, { Op } from 'sequelize'
 
 import Search, { where, include } from '$src/Search'
+import fulltextFilter from '$src/Search/search_filters/fulltextFilter'
 import { Customer, PhoneNumber, Task } from '$src/models'
 
 /**
@@ -14,6 +15,8 @@ class SearchCustomers extends Search {
   static orderableBy = ['createdAt']
 
   static filters = {
+    fulltext: fulltextFilter('customers_document("Customer")'),
+
     phoneNumber(queryOptions, value) {
       if (!value) { return queryOptions }
 

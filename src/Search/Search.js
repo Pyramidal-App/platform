@@ -1,7 +1,9 @@
+import { Op } from 'sequelize'
+
 import update from 'lodash.update'
 import toPairs from 'lodash.topairs'
-import BusinessAction from '$src/BusinessAction'
 
+import BusinessAction from '$src/BusinessAction'
 import visibleToUser from './search_filters/visibleToUser'
 
 /**
@@ -15,9 +17,14 @@ const include = ({ include, ...queryOptions }, newInclude) => ({
 /**
  * A helper to manipulate queryOptions object
  */
-const where = ({ where, ...queryOptions }, whereClauses) => ({
+const where = ({ where = {}, ...queryOptions }, whereClauses) => ({
   ...queryOptions,
-  where: { ...where, ...whereClauses }
+  where: { [Op.and]: [...(where[Op.and] || []), whereClauses] }
+})
+
+const order = ({ order = [], ...queryOptions}, newOrder) => ({
+  ...queryOptions,
+  order: [...order, newOrder]
 })
 
 /**
@@ -165,5 +172,5 @@ class Search extends BusinessAction {
   }
 }
 
-export { where, include }
+export { where, include, order }
 export default Search

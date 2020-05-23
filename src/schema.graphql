@@ -246,8 +246,9 @@ input CustomerSearchOrder {
 }
 
 input CustomerSearchFilters {
-  phoneNumber: PhoneNumberIdentifiers,
+  phoneNumber: PhoneNumberIdentifiers
   id: String
+  fulltext: String
   inLimbo: Boolean
 }
 

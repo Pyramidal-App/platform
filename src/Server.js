@@ -177,7 +177,7 @@ const Server = new ApolloServer({
     },
 
     PhoneNumber: {
-      displayValue: pn => `+${pn.countryCode} - ${pn.areaCode} - ${pn.number}`,
+      displayValue: pn => `+${pn.countryCode} (${pn.areaCode}) ${pn.number}`,
       telemarketingPrefix: pn => pn.number.slice(0, -2),
       displayTelemarketingPrefix: pn => `+${pn.countryCode} (${pn.areaCode}) ${pn.number.slice(0, -2)}**`,
       isMobile: pn => pn.areaCode[0] === '9'
