@@ -80,8 +80,10 @@ type CallPage implements RecordPage {
   data: [Call]!
 }
 
-type PhoneNumber {
+type PhoneNumber implements Record {
   id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   customers: [Customer]!
   countryCode: String!
   areaCode: String!
@@ -90,6 +92,43 @@ type PhoneNumber {
   telemarketingPrefix: String!
   displayTelemarketingPrefix: String!
   isMobile: Boolean!
+  lastInteraction: Call
+  dontCall: Boolean
+}
+
+enum PhoneNumberSearchOrderIdentifier {
+  createdAt
+  countryCode
+  areaCode
+  number
+  lastInteractionDate
+}
+
+input PhoneNumberSearchOrder {
+  identifier: PhoneNumberSearchOrderIdentifier!
+  direction: SearchOrderDirection
+}
+
+input PhoneNumberSearchFilters {
+  fulltext: String
+  minLastInteractionDate: DateTime
+  maxLastInteractionDate: DateTime
+}
+
+input PhoneNumberSearchInput {
+  page: Int
+  recordsPerPage: Int
+  limit: Int
+  filters: PhoneNumberSearchFilters
+  orderBy: [PhoneNumberSearchOrder]
+}
+
+type PhoneNumberPage implements RecordPage {
+  page: Int
+  totalPages: Int
+  total: Int
+  recordsPerPage: Int
+  data: [PhoneNumber!]!
 }
 
 type Address {
@@ -405,7 +444,7 @@ type Mutation {
   updateAddress(input: UpdateAddressInput!): Address!
   createCall(input: CreateCallInput!): Call!
   updateCurrentUser(input: UpdateCurrentUserInput!): User!
-  markNotificationsRead(notificationIds: [ID!]): [Notification]!
+  markNotificationsRead(notificationIds: [ID!]!): [Notification!]!
 
   createTeam(input: CreateTeamInput!): Team!
   destroyTeam(teamId: ID!): GenericActionResponse!
@@ -423,14 +462,15 @@ type Mutation {
   createNote(input: CreateNoteInput!): Note!
   deleteNote(noteId: ID!): GenericActionResponse!
 
-  getGooglePlacesInfo(googlePlaceIds: [ID!]): [GooglePlace]!
+  getGooglePlacesInfo(googlePlaceIds: [ID!]): [GooglePlace!]!
 }
 
 type Query {
   telemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet
-  telemarketingSheets: [TelemarketingSheet]
+  telemarketingSheets: [TelemarketingSheet!]
   currentUser: User
-  argentinaAreaCodes(filter: String!): [ArgentinaAreaCodeMatch]!
+  argentinaAreaCodes(filter: String!): [ArgentinaAreaCodeMatch!]!
+  phoneNumbers(input: PhoneNumberSearchInput!): PhoneNumberPage
 }
 
 type Subscription {

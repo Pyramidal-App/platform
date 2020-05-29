@@ -1,9 +1,9 @@
 import { ApolloLogExtension } from 'apollo-log'
 import { ApolloServer, gql, withFilter } from 'apollo-server'
-import { Op } from 'sequelize'
 import { GraphQLDateTime } from 'graphql-iso-date'
 import set from 'lodash.set'
 import slugify from '@sindresorhus/slugify'
+import visibleToUser from '$src/Search/search_filters/visibleToUser'
 
 import {
   Customer,
@@ -30,6 +30,7 @@ import Customers from '$src/domains/Customers'
 import InteractionRegistry from '$src/domains/InteractionRegistry'
 import Notes from '$src/domains/Notes'
 import Teams from '$src/domains/Teams'
+import PhoneNumbers from '$src/domains/PhoneNumbers'
 
 import LogInWithGoogle from './business_actions/LogInWithGoogle'
 import FindOrCreateTelemarketingSheet from './business_actions/FindOrCreateTelemarketingSheet'
@@ -71,7 +72,8 @@ const Server = new ApolloServer({
         passingInput: false
       }),
       currentUser: (_root, _args, { currentUser }) => currentUser,
-      argentinaAreaCodes: resolveWithBA(SearchArgentinaAreaCodes, { passingInput: false })
+      argentinaAreaCodes: resolveWithBA(SearchArgentinaAreaCodes, { passingInput: false }),
+      phoneNumbers: resolveWithSearch(PhoneNumbers.search, { filterVisibleToUser: false })
     },
 
     Mutation: {
@@ -126,12 +128,18 @@ const Server = new ApolloServer({
         await new Customer({ id: customer.id }).getAddresses(),
       calls: async customer =>
         await new Customer({ id: customer.id }).getCalls(),
-      tasks: resolveWithSearch(Tasks.search, customer => ({ where: { CustomerId: customer.id } })),
+      tasks: resolveWithSearch(Tasks.search, {
+        queryOptions: customer => ({ where: { CustomerId: customer.id } })
+      }),
       userId: customer => customer.UserId,
       user: async customer => await User.findByPk(customer.UserId),
       slug: customer => slugify(`${customer.id}-${customer.name}`),
-      calls: resolveWithSearch(InteractionRegistry.search, customer => ({ where: { CustomerId: customer.id } })),
-      notes: resolveWithSearch(Notes.search, customer => ({ where: { CustomerId: customer.id } }))
+      calls: resolveWithSearch(InteractionRegistry.search, {
+        queryOptions: customer => ({ where: { CustomerId: customer.id } })
+      }),
+      notes: resolveWithSearch(Notes.search, {
+        queryOptions: customer => ({ where: { CustomerId: customer.id } })
+      })
     },
 
     Task: {
@@ -180,7 +188,21 @@ const Server = new ApolloServer({
       displayValue: pn => `+${pn.countryCode} (${pn.areaCode}) ${pn.number}`,
       telemarketingPrefix: pn => pn.number.slice(0, -2),
       displayTelemarketingPrefix: pn => `+${pn.countryCode} (${pn.areaCode}) ${pn.number.slice(0, -2)}**`,
-      isMobile: pn => pn.areaCode[0] === '9'
+      isMobile: pn => pn.areaCode[0] === '9',
+      //customers: pn => pn.getCustomers(),
+      customers: async (pn, _input, { currentUser }) => (
+        ({})
+        |> await visibleToUser(#, currentUser.id)
+        |> await pn.getCustomers(#)
+      ),
+      lastInteraction: async pn => {
+        const [lastInteraction] = await pn.getCalls({ 
+          order: [['createdAt', 'desc']],
+          limit: 1
+        })
+
+        return lastInteraction
+      },
     },
 
     Note: {

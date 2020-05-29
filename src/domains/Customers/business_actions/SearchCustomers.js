@@ -22,21 +22,22 @@ class SearchCustomers extends Search {
 
       const { countryCode, areaCode, number } = value
 
-      return include(queryOptions, [{
+      return include(queryOptions, {
         model: PhoneNumber,
         where: { countryCode, areaCode, number }
-      }])
+      })
     },
 
     id(queryOptions, value) {
-      const id = typeof value === 'string' ? value.match(/^(\d+)/)[1] : value
+      const id = typeof value === 'string' ? value.match(/^(\d+)/)?.[1] : value
       return where(queryOptions, { id })
     },
 
     inLimbo(queryOptions) {
-      return where(queryOptions, {
-        [Op.and]: [seq.literal(`NOT EXISTS (SELECT FROM "Tasks" WHERE "Tasks"."CustomerId" = "Customer".id AND "Tasks".status = 'PENDING')`)]
-      })
+      return where(
+        queryOptions,
+        seq.literal(`NOT EXISTS (SELECT FROM "Tasks" WHERE "Tasks"."CustomerId" = "Customer".id AND "Tasks".status = 'PENDING')`)
+      )
     }
   }
 }

@@ -1,30 +1,56 @@
-import { Op } from 'sequelize'
+import seq, { Op } from 'sequelize'
+import isEqual from 'lodash.isequal'
 
 import update from 'lodash.update'
 import toPairs from 'lodash.topairs'
 
 import BusinessAction from '$src/BusinessAction'
-import visibleToUser from './search_filters/visibleToUser'
 
 /**
  * A helper to manipulate queryOptions object
  */
-const include = ({ include, ...queryOptions }, newInclude) => ({
+const include = ({ include = [], ...queryOptions }, newInclude) => ({
   ...queryOptions,
-  include: [...include, ...newInclude]
+  include: [...include, newInclude]
 })
 
 /**
  * A helper to manipulate queryOptions object
  */
-const where = ({ where = {}, ...queryOptions }, whereClauses) => ({
+const includeOnce = (queryOptions, newInclude) => {
+  if (queryOptions.include?.find(i => isEqual(i, newInclude))) {
+    return queryOptions
+  }
+
+  return include(queryOptions, newInclude)
+}
+
+/**
+ * A helper to manipulate queryOptions object
+ */
+const where = ({ where = {}, ...queryOptions }, whereClause) => ({
   ...queryOptions,
-  where: { [Op.and]: [...(where[Op.and] || []), whereClauses] }
+  where: { [Op.and]: [...(where[Op.and] || []), whereClause] }
 })
 
+/**
+ * A helper to manipulate queryOptions object
+ */
 const order = ({ order = [], ...queryOptions}, newOrder) => ({
   ...queryOptions,
   order: [...order, newOrder]
+})
+
+/**
+ * A helper to manipulate queryOptions object
+ */
+//const select = ({ attributes = {}, ...queryOptions}, attribute) => ({
+  //...queryOptions,
+  //attributes: {...attributes, include: [...(attributes.include || []), attribute] }
+//})
+const select = ({ attributes = [], ...queryOptions}, attribute) => ({
+  ...queryOptions,
+  attributes: [ ...attributes, attribute]
 })
 
 /**
@@ -97,21 +123,6 @@ class Search extends BusinessAction {
   }
 
   /*
-   * @todo This either needs killing or a compliment. Not sure.
-   */
-  static visibleToUser(userId) {
-    return class extends this {
-      async _queryOptions(...args) {
-        return (
-          super._queryOptions(...args)
-          |> await(#)
-          |> visibleToUser(#, userId)
-        )
-      }
-    }
-  }
-
-  /*
    * @abstract
    * @private
    */
@@ -137,6 +148,8 @@ class Search extends BusinessAction {
    */
   async _queryOptions() {
     let accumulator = {
+      distinct: true,
+      includeIgnoreAttributes: false,
       where: this.params.queryOptions.where || {},
       include: this.params.queryOptions.include || [],
       order: this.params.queryOptions.order || [],
@@ -152,11 +165,7 @@ class Search extends BusinessAction {
     }
 
     for (const { identifier, direction } of this.params.orderBy) {
-      if (!this.constructor.orderableBy.includes(identifier)) {
-        throw new UnsupportedSearchOrderIdentifier(identifier)
-      }
-
-      accumulator = update(accumulator, 'order', order => [...order, [identifier, direction]] )
+      accumulator = this.constructor._orderDefinition(identifier)(accumulator, direction)
     }
 
     return accumulator
@@ -170,7 +179,27 @@ class Search extends BusinessAction {
   _page() {
     return this.params.page
   }
+
+  static _orderDefinition(identifier) {
+    let definition
+
+    for (const val of this.orderableBy) {
+      if (Array.isArray(val) && val[0] === identifier) {
+        definition = val[1]
+        break
+      } else if (val === identifier) {
+        definition = (queryOptions, direction) => order(queryOptions, [identifier, direction])
+        break
+      }
+    }
+
+    if (!definition) {
+      throw new UnsupportedSearchOrderIdentifier(identifier)
+    }
+
+    return definition
+  }
 }
 
-export { where, include, order }
+export { where, include, includeOnce, order, select }
 export default Search

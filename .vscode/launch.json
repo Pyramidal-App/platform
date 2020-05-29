@@ -1,0 +1,9 @@
+{
+  "type": "node",
+  "request": "launch",
+  "name": "Launch via Yarn",
+  "runtimeExecutable": "yarn",
+  "cwd": "${relativeFileDirname}",
+  "runtimeArgs": ["start"],
+  "port": 5858
+}

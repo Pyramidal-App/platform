@@ -1,19 +1,27 @@
 import withApolloServerErrorAdapting from '$src/withApolloServerErrorAdapting'
+import visibleToUser from '$src/Search/search_filters/visibleToUser'
 
 /**
 * A HOF that takes a search object constructor and returns a GQL resolver function.
 */
 const resolveWithSearch = (
   searchConstructor,
-  queryOptions = _record => ({})
+  {
+    filterVisibleToUser = true,
+    queryOptions = record => ({})
+  } = {}
 ) => (
   withApolloServerErrorAdapting(async (record, { input = {} }, { currentUser }) => {
-    const filteredSearch = searchConstructor.visibleToUser(currentUser.id)
+    const params =
+      filterVisibleToUser ?
+      visibleToUser(input, currentUser.id) :
+      {}
 
-    // Tough decision. Should we give priority to client filters or server filters?
-    // Maybe we should differentiate between client, permanent and default filters.
-    const params = { ...input, queryOptions: queryOptions(record) }
-    const search = new filteredSearch(params, currentUser)
+    const search = new searchConstructor(
+      { ...queryOptions(record), ...input },
+      currentUser
+    )
+
     const result = await search.perform()
 
     return result
