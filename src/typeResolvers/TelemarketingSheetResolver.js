@@ -7,6 +7,7 @@ const collectionContainsNumber = (collection, lastNumbers) =>
   !!collection.find(pn => pn.number.slice(-2) === lastNumbers)
 
 const TelemarketingSheetResolver = {
+  displayNumber: ts => `+${ts.countryCode} (${ts.areaCode}) ${ts.firstNumbers}**`,
   numberInfo: async (sheet, _args, { currentUser }) => {
     const { countryCode, areaCode, firstNumbers } = sheet.dataValues
 

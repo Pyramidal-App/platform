@@ -147,6 +147,7 @@ type TelemarketingSheet {
   areaCode: Int!
   firstNumbers: Int!
   numberInfo: [TelemarketingSheetNumberInfo!]!
+  displayNumber: String!
 }
 
 type TelemarketingSheetNumberInfo {
