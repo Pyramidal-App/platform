@@ -7,10 +7,7 @@ Note.init({
     type: Sequelize.INTEGER,
     allowNull: false
   },
-  CustomerId: {
-    type: Sequelize.INTEGER,
-    allowNull: false
-  },
+  CustomerId: Sequelize.INTEGER,
   CallId: Sequelize.INTEGER,
   PhoneNumberId: Sequelize.INTEGER,
   body: {

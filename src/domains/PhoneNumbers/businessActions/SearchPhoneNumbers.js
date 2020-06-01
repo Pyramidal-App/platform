@@ -2,7 +2,7 @@ import seq from 'sequelize'
 
 import Search, { includeOnce, order, select, where } from '$src/Search'
 import fulltextFilter from '$src/Search/search_filters/fulltextFilter'
-import { PhoneNumber, Call } from '$src/models'
+import { PhoneNumber, Interaction } from '$src/models'
 
 class SearchPhoneNumbers extends Search {
   static model = PhoneNumber
@@ -14,8 +14,8 @@ class SearchPhoneNumbers extends Search {
     'number',
     ['lastInteractionDate', (queryOptions, direction) => (
       queryOptions
-      |> includeOnce(#, { model: Call, required: false })
-      |> order(#, [{ model: Call }, 'createdAt', direction])
+      |> includeOnce(#, { model: Interaction, required: false })
+      |> order(#, [{ model: Interaction }, 'createdAt', direction])
     )]
   ]
 

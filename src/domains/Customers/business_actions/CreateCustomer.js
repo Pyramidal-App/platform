@@ -62,6 +62,7 @@ class CreateCustomer extends BusinessAction {
   async _associatePhoneNumber(customerId, { countryCode, areaCode, number, delete: DELETED }) {
     if (DELETED) { return }
 
+    // Use PhoneNumbers.findOrCreate instead
     const [dbPhoneNumber] = await PhoneNumber.findOrCreate({
       where: { countryCode, areaCode, number },
       transaction: this.transaction

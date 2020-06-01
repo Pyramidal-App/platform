@@ -7,7 +7,7 @@ import visibleToUser from '$src/Search/search_filters/visibleToUser'
 
 import {
   Customer,
-  Call,
+  Interaction,
   User,
   Task,
   Team,
@@ -37,7 +37,6 @@ import FindOrCreateTelemarketingSheet from './business_actions/FindOrCreateTelem
 import FindTelemarketingSheet from './business_actions/FindTelemarketingSheet'
 import ListTelemarketingSheets from './business_actions/ListTelemarketingSheets'
 import UpdateAddress from './business_actions/UpdateAddress'
-import CreateCall from './business_actions/CreateCall'
 import UpdateCurrentUser from './business_actions/UpdateCurrentUser'
 import SearchArgentinaAreaCodes from './business_actions/SearchArgentinaAreaCodes'
 import GetGooglePlacesInfo from './business_actions/GetGooglePlacesInfo'
@@ -62,6 +61,7 @@ const Server = new ApolloServer({
     }
   },
   typeDefs,
+  cors: true,
   resolvers: {
     // Custom scalar
     DateTime: GraphQLDateTime,
@@ -73,7 +73,9 @@ const Server = new ApolloServer({
       }),
       currentUser: (_root, _args, { currentUser }) => currentUser,
       argentinaAreaCodes: resolveWithBA(SearchArgentinaAreaCodes, { passingInput: false }),
-      phoneNumbers: resolveWithSearch(PhoneNumbers.search, { filterVisibleToUser: false })
+      phoneNumbers: resolveWithSearch(PhoneNumbers.search, { filterVisibleToUser: false }),
+      phoneNumber: async (_root, { id }) => await PhoneNumbers.findByPk(id),
+      interactions: resolveWithSearch(InteractionRegistry.search)
     },
 
     Mutation: {
@@ -82,30 +84,41 @@ const Server = new ApolloServer({
         FindOrCreateTelemarketingSheet
       ),
       updateAddress: resolveWithBA(UpdateAddress),
-      createCall: resolveWithBA(CreateCall),
       updateCurrentUser: resolveWithBA(UpdateCurrentUser),
 
+      // Phone numbers
+      findOrCreatePhoneNumber: resolveWithBA(PhoneNumbers.findOrCreate),
+
+      // Teams
       createTeam: resolveWithBA(Teams.create),
       destroyTeam: resolveWithBA(Teams.destroy, { passingInput: false }),
       inviteToTeam: resolveWithBA(Teams.invite),
       leaveTeam: resolveWithBA(Teams.leave, { passingInput: false }),
       removeTeamMember: resolveWithBA(Teams.removeMember),
 
+      // Contacts
       createCustomer: resolveWithBA(Customers.create),
       updateCustomer: resolveWithBA(Customers.update),
       destroyContact: resolveWithBA(Customers.destroy, { passingInput: false }),
 
+      // Tasks
       createTask: resolveWithBA(Tasks.create),
       cancelTask: resolveWithBA(Tasks.cancel, { passingInput: false }),
       completeTask: resolveWithBA(Tasks.complete, { passingInput: false }),
 
+      // Notifications
       markNotificationsRead: resolveWithBA(Notifications.markAsRead, {
         passingInput: false
       }),
 
+      // Notes
       createNote: resolveWithBA(Notes.create),
       deleteNote: resolveWithBA(Notes.delete, { passingInput: false }),
 
+      // Interactions
+      createInteraction: resolveWithBA(InteractionRegistry.createInteraction),
+
+      // Google plages
       getGooglePlacesInfo: resolveWithBA(GetGooglePlacesInfo, { passingInput: false })
     },
 
@@ -128,7 +141,7 @@ const Server = new ApolloServer({
       addresses: async customer =>
         await new Customer({ id: customer.id }).getAddresses(),
       calls: async customer =>
-        await new Customer({ id: customer.id }).getCalls(),
+        await new Customer({ id: customer.id }).getInteractions(),
       tasks: resolveWithSearch(Tasks.search, {
         queryOptions: customer => ({ where: { CustomerId: customer.id } })
       }),
@@ -136,7 +149,7 @@ const Server = new ApolloServer({
       user: async customer => await User.findByPk(customer.UserId),
       slug: customer => slugify(`${customer.id}-${customer.name}`),
       calls: resolveWithSearch(InteractionRegistry.search, {
-        queryOptions: customer => ({ where: { CustomerId: customer.id } })
+        queryOptions: ({ id: CustomerId }) => ({ where: { CustomerId } })
       }),
       notes: resolveWithSearch(Notes.search, {
         queryOptions: customer => ({ where: { CustomerId: customer.id } })
@@ -146,7 +159,7 @@ const Server = new ApolloServer({
     Task: {
       user: async task => await User.findByPk(task.UserId),
       customer: async task => await Customer.findByPk(task.CustomerId),
-      triggererCall: async task => await Call.findByPk(task.TriggererCallId),
+      triggererCall: async task => await Interaction.findByPk(task.TriggererCallId),
     },
 
     User: {
@@ -190,20 +203,22 @@ const Server = new ApolloServer({
       telemarketingPrefix: pn => pn.number.slice(0, -2),
       displayTelemarketingPrefix: pn => `+${pn.countryCode} (${pn.areaCode}) ${pn.number.slice(0, -2)}**`,
       isMobile: pn => pn.areaCode[0] === '9',
-      //customers: pn => pn.getCustomers(),
       customers: async (pn, _input, { currentUser }) => (
         ({})
         |> await visibleToUser(#, currentUser.id)
         |> await pn.getCustomers(#)
       ),
       lastInteraction: async pn => {
-        const [lastInteraction] = await pn.getCalls({ 
+        const [lastInteraction] = await pn.getInteractions({
           order: [['createdAt', 'desc']],
           limit: 1
         })
 
         return lastInteraction
       },
+      calls: resolveWithSearch(InteractionRegistry.search, {
+        queryOptions: ({ id: PhoneNumberId }) => ({ where: { PhoneNumberId } })
+      }),
     },
 
     Note: {
