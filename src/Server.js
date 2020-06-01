@@ -93,6 +93,7 @@ const Server = new ApolloServer({
 
       createCustomer: resolveWithBA(Customers.create),
       updateCustomer: resolveWithBA(Customers.update),
+      destroyContact: resolveWithBA(Customers.destroy, { passingInput: false }),
 
       createTask: resolveWithBA(Tasks.create),
       cancelTask: resolveWithBA(Tasks.cancel, { passingInput: false }),

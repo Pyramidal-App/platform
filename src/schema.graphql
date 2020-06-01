@@ -455,6 +455,7 @@ type Mutation {
 
   createCustomer(input: CreateCustomerInput!): Customer!
   updateCustomer(input: UpdateCustomerInput!): Customer!
+  destroyContact(contactId: ID!): GenericActionResponse!
 
   createTask(input: CreateTaskInput!): Task!
   cancelTask(taskId: ID!): Task!

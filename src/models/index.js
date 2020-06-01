@@ -64,10 +64,14 @@ Notification.belongsTo(User)
 
 GooglePlace.belongsTo(PhoneNumber)
 
+// TODO: remove this after renaming "Customer" to "Contact"
+const Contact = Customer
+
 export {
   User,
   TelemarketingSheet,
   Customer,
+  Contact,
   CustomersPhoneNumber,
   PhoneNumber,
   Address,
