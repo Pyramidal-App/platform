@@ -1,4 +1,4 @@
-import { User, Customer, Call, PhoneNumber } from '$src/models'
+import { User, Customer, Interaction, PhoneNumber } from '$src/models'
 
 const OUTCOMES = {
   DIDNT_ANSWER: 'No contestó',
@@ -10,7 +10,7 @@ const OUTCOMES = {
 const CallResolver = {
   user: async call => await User.findByPk(call.UserId),
   customer: async call => await Customer.findByPk(call.CustomerId),
-  notes: async call => await new Call({ id: call.id }).getNotes(),
+  notes: async call => await new Interaction({ id: call.id }).getNotes(),
   phoneNumber: async call => await PhoneNumber.findByPk(call.PhoneNumberId),
   displayOutcome: call => OUTCOMES[call.outcome]
 }

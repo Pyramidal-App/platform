@@ -94,6 +94,7 @@ type PhoneNumber implements Record {
   isMobile: Boolean!
   lastInteraction: Call
   dontCall: Boolean
+  calls(input: CallSearchInput): CallPage
 }
 
 enum PhoneNumberSearchOrderIdentifier {
@@ -188,7 +189,7 @@ type Task implements Record {
   user: User!
   triggererCall: Call!
   taskType: TaskType!
-  dueDate: DateTime!
+  dueDate: DateTime
   status: TaskStatus!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -317,7 +318,8 @@ input NoteSearchInput {
 }
 
 input CallSearchFilters {
-  customerId: Int
+  customerId: ID
+  phoneNumberId: ID
 }
 
 enum CallSearchOrderIdentifier {
@@ -400,9 +402,9 @@ input UpdateAddressInput {
   lng: Float
 }
 
-input CreateCallInput {
+input CreateInteractionInput {
   phoneNumberId: ID!
-  customerId: ID!
+  customerId: ID
   outcome: CallOutcome!
   dateTime: DateTime!
   notes: String
@@ -443,27 +445,37 @@ type Mutation {
   logInWithGoogle(input: LogInWithGoogleInput!): UserAndToken!
   findOrCreateTelemarketingSheet(input: TelemarketingSheetIdentifiers!): TelemarketingSheet!
   updateAddress(input: UpdateAddressInput!): Address!
-  createCall(input: CreateCallInput!): Call!
   updateCurrentUser(input: UpdateCurrentUserInput!): User!
   markNotificationsRead(notificationIds: [ID!]!): [Notification!]!
 
+  # Phone numbers
+  findOrCreatePhoneNumber(input: PhoneNumberIdentifiers!): PhoneNumber!
+
+  # Teams
   createTeam(input: CreateTeamInput!): Team!
   destroyTeam(teamId: ID!): GenericActionResponse!
   leaveTeam(teamId: ID!): GenericActionResponse!
   inviteToTeam(input: InviteToTeamInput!): TeamMembership!
   removeTeamMember(input: RemoveTeamMemberInput!): GenericActionResponse!
 
+  # Contacts
   createCustomer(input: CreateCustomerInput!): Customer!
   updateCustomer(input: UpdateCustomerInput!): Customer!
   destroyContact(contactId: ID!): GenericActionResponse!
 
+  # Tasks
   createTask(input: CreateTaskInput!): Task!
   cancelTask(taskId: ID!): Task!
   completeTask(taskId: ID!): Task!
 
+  # Notes
   createNote(input: CreateNoteInput!): Note!
   deleteNote(noteId: ID!): GenericActionResponse!
 
+  # Interactions
+  createInteraction(input: CreateInteractionInput!): Call!
+
+  # GooglePlaces
   getGooglePlacesInfo(googlePlaceIds: [ID!]): [GooglePlace!]!
 }
 
@@ -473,6 +485,8 @@ type Query {
   currentUser: User
   argentinaAreaCodes(filter: String!): [ArgentinaAreaCodeMatch!]!
   phoneNumbers(input: PhoneNumberSearchInput!): PhoneNumberPage
+  phoneNumber(id: ID!): PhoneNumber!
+  interactions(input: CallSearchInput): CallPage!
 }
 
 type Subscription {

@@ -4,7 +4,7 @@ import Customer from './Customer'
 import CustomersPhoneNumber from './CustomersPhoneNumber'
 import PhoneNumber from './PhoneNumber'
 import Address from './Address'
-import Call from './Call'
+import Interaction from './Interaction'
 import Note from './Note'
 import Task from './Task'
 import Team from './Team'
@@ -15,7 +15,7 @@ import GooglePlace from './GooglePlace'
 
 User.hasMany(TelemarketingSheet)
 User.hasMany(Customer)
-User.hasMany(Call)
+User.hasMany(Interaction)
 User.hasMany(Task)
 User.hasMany(TeamMembership)
 User.hasMany(Notification)
@@ -28,7 +28,7 @@ Address.belongsTo(Customer)
 Customer.belongsTo(User)
 Customer.hasMany(Address)
 Customer.hasMany(CustomersPhoneNumber)
-Customer.hasMany(Call)
+Customer.hasMany(Interaction)
 Customer.hasMany(Task)
 Customer.belongsToMany(PhoneNumber, { through: CustomersPhoneNumber })
 
@@ -36,23 +36,23 @@ CustomersPhoneNumber.belongsTo(Customer)
 CustomersPhoneNumber.belongsTo(PhoneNumber)
 
 PhoneNumber.hasMany(CustomersPhoneNumber)
-PhoneNumber.hasMany(Call)
+PhoneNumber.hasMany(Interaction)
 PhoneNumber.belongsToMany(Customer, { through: CustomersPhoneNumber })
 
-Call.belongsTo(User)
-Call.belongsTo(Customer)
-Call.belongsTo(PhoneNumber)
-Call.hasMany(Note)
-Call.hasMany(Task, { as: 'triggeredCalls', foreignKey: 'TriggererCallId' })
+Interaction.belongsTo(User)
+Interaction.belongsTo(Customer)
+Interaction.belongsTo(PhoneNumber)
+Interaction.hasMany(Note)
+Interaction.hasMany(Task, { as: 'triggeredCalls', foreignKey: 'TriggererCallId' })
 
 Note.belongsTo(User)
 Note.belongsTo(Customer)
 Note.belongsTo(PhoneNumber)
-Note.belongsTo(Call)
+Note.belongsTo(Interaction)
 
 Task.belongsTo(User)
 Task.belongsTo(Customer)
-Task.belongsTo(Call, { as: 'triggererCall', foreignKey: 'TriggererCallId' })
+Task.belongsTo(Interaction, { as: 'triggererCall', foreignKey: 'TriggererCallId' })
 
 Team.hasMany(TeamMembership, { as: 'memberships' })
 Team.belongsToMany(User, { through: TeamMembership, as: 'members' })
@@ -75,7 +75,7 @@ export {
   CustomersPhoneNumber,
   PhoneNumber,
   Address,
-  Call,
+  Interaction,
   Note,
   Task,
   Team,

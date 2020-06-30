@@ -1,5 +1,5 @@
 import BusinessAction from '$src/BusinessAction'
-import { Contact, Task, Address, Note, CustomersPhoneNumber, Call } from '$src/models'
+import { Contact, Task, Address, Note, CustomersPhoneNumber, Interaction } from '$src/models'
 
 class DestroyContact extends BusinessAction {
   async isAllowed() {
@@ -16,7 +16,7 @@ class DestroyContact extends BusinessAction {
     await Address.destroy({ where: { CustomerId }, transaction })
     await Note.destroy({ where: { CustomerId }, transaction })
     await CustomersPhoneNumber.destroy({ where: { CustomerId }, transaction })
-    await Call.destroy({ where: { CustomerId }, transaction })
+    await Interaction.destroy({ where: { CustomerId }, transaction })
     await contact.destroy({ transaction })
   }
 

@@ -1,10 +1,15 @@
 import Search from '$src/Search'
-import { Call } from '$src/models'
+import opFilter from '$src/Search/search_filters/opFilter'
+import { Interaction } from '$src/models'
 
 class SearchInteractionRegistry extends Search {
-  static model = Call
+  static model = Interaction
   static orderableBy = ['createdAt', 'dateTime']
-  static filters = {}
+
+  static filters = {
+    phoneNumberId: opFilter('PhoneNumberId'),
+    customerId: opFilter('CustomerId')
+  }
 }
 
 export default SearchInteractionRegistry

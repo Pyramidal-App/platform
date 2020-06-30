@@ -1,8 +1,8 @@
 import Model, { Sequelize } from '../Model'
 
-class Call extends Model {}
+class Interaction extends Model {}
 
-Call.init({
+Interaction.init({
   outcome: {
     type: Sequelize.STRING,
     allowNull: false
@@ -11,10 +11,7 @@ Call.init({
     type: Sequelize.INTEGER,
     allowNull: false
   },
-  CustomerId: {
-    type: Sequelize.INTEGER,
-    allowNull: false
-  },
+  CustomerId: Sequelize.INTEGER,
   UserId: {
     type: Sequelize.INTEGER,
     allowNull: false
@@ -25,4 +22,4 @@ Call.init({
   }
 })
 
-export default Call
+export default Interaction
