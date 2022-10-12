@@ -18,7 +18,7 @@
     "@sindresorhus/slugify": "^0.11.0",
     "agenda": "^3.0.0",
     "apollo-log": "^0.1.0",
-    "apollo-server": "^2.11.0",
+    "apollo-server": "^2.25.4",
     "babel-plugin-module-resolver": "^4.0.0",
     "continuation-local-storage": "^3.2.1",
     "date-fns": "^2.11.1",
